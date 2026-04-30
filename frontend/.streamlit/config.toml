@@ -1,0 +1,14 @@
+[theme]
+# Colore principale per accenti, bottoni attivi, slider, ecc. (Blu Professionale)
+primaryColor = "#004B87" 
+
+# Sfondo della pagina
+backgroundColor = "#FFFFFF"
+
+# Sfondo dei widget secondari (grigio chiarissimo/azzurrato)
+secondaryBackgroundColor = "#F4F6F9"
+
+# Colore del testo
+textColor = "#1E293B"
+
+font = "sans serif"
