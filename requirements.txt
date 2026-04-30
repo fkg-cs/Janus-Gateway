@@ -1,0 +1,17 @@
+# Backend e API
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.4.2
+
+# Frontend
+streamlit==1.28.1
+
+# Elaborazione Knowledge Base (JSON/STIX)
+stix2==3.0.1
+
+# Parsing dei Documenti e Metadati
+PyPDF2==3.0.1
+pdfplumber==0.10.3
+
+# Interazione con Ollama Locale
+requests==2.31.0
