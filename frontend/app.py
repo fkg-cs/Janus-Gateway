@@ -90,15 +90,14 @@ if page == "Basi di Conoscenza":
                 st.header(f"{tech['id']}: {tech['name']}")
 
                 # --- DASHBOARD METADATI INTEGRATA ---
-                col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+                col_m1, col_m2, col_m3= st.columns(3)
                 with col_m1:
                     st.metric("Demonstrated", tech.get('demonstrated', 'N/A'))
                 with col_m2:
                     st.metric("Case Studies", tech.get('case_studies_count', 0))
                 with col_m3:
                     st.metric("Mitigations", tech.get('mitigations_count', 0))
-                with col_m4:
-                    st.metric("Platforms", len(tech.get('platforms', [])))
+
 
                 st.divider()
 
@@ -112,10 +111,10 @@ if page == "Basi di Conoscenza":
                     st.markdown(f"**🎯 Tactics:** {', '.join(tactics) if tactics else 'N/A'}")
 
                 st.subheader("Description")
-                st.write(tech.get('description', 'Nessuna descrizione disponibile.'))
+                st.write(tech.get('description', 'No description avilable.'))
 
                 if tech.get('mitigations'):
-                    st.subheader("🛡️ Mitigazioni Suggerite")
+                    st.subheader("🛡Mitigations")
                     for m in tech['mitigations']:
                         st.info(m)
 

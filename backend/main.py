@@ -101,6 +101,7 @@ async def get_all_techniques():
 
 @app.get("/techniques/{stix_id}")
 async def get_technique_details(stix_id: str):
+    """Restituisce i dettagli navigando il grafo STIX 2.1 per Mitigazioni e Case Studies"""
     technique = store.get(stix_id)
     if not technique:
         raise HTTPException(status_code=404, detail="Tecnica non trovata")
@@ -109,10 +110,53 @@ async def get_technique_details(stix_id: str):
                     "N/A")
     created_str = technique.created.strftime("%d %B %Y") if hasattr(technique, 'created') else "N/A"
     modified_str = technique.modified.strftime("%d %B %Y") if hasattr(technique, 'modified') else "N/A"
-    mitigations = getattr(technique, 'x_mitre_mitigations', [])
+
+    # --- 1. NAVIGAZIONE DEL GRAFO: MITIGAZIONI ---
+    mitigations = []
+    # Cerchiamo tutte le relazioni di tipo "mitigates" che puntano a questa tecnica
+    mitigation_rels = store.query([
+        Filter("type", "=", "relationship"),
+        Filter("relationship_type", "=", "mitigates"),
+        Filter("target_ref", "=", technique.id)
+    ])
+
+    for rel in mitigation_rels:
+        # Recuperiamo l'oggetto Course of Action sorgente
+        coa = store.get(rel.source_ref)
+        if coa:
+            desc = getattr(coa, 'description', '')
+            mitigations.append(f"{coa.name}: {desc}")
+
+    # Fallback: controlliamo anche la vecchia property piatta se presente
+    if not mitigations:
+        old_format_mitigations = getattr(technique, 'x_mitre_mitigations', [])
+        mitigations.extend(old_format_mitigations)
+
     mitigations_count = len(mitigations)
-    case_studies = [ref for ref in getattr(technique, 'external_references', []) if
-                    ref.source_name == "mitre-atlas-case-study"]
+
+    # --- 2. NAVIGAZIONE DEL GRAFO: CASE STUDIES ---
+    case_studies = []
+
+    # Molti Case Studies in ATLAS sono mappati come riferimenti esterni con URL specifici
+    for ref in getattr(technique, 'external_references', []):
+        url = getattr(ref, 'url', '')
+        desc = getattr(ref, 'description', '').lower()
+        if 'studies' in url or 'case-study' in url or 'case' in desc:
+            case_studies.append(getattr(ref, 'source_name', 'Case Study'))
+
+    # Cerchiamo anche relazioni in ingresso di tipo "uses" (Gruppi/Incidenti che usano la tecnica)
+    usage_rels = store.query([
+        Filter("type", "=", "relationship"),
+        Filter("target_ref", "=", technique.id)
+    ])
+    for rel in usage_rels:
+        source_obj = store.get(rel.source_ref)
+        if source_obj and source_obj.type not in ["course-of-action", "identity"]:
+            if rel.relationship_type == "uses":
+                case_studies.append(source_obj.name)
+
+    # Pulizia dai duplicati
+    case_studies = list(set(case_studies))
     case_studies_count = len(case_studies)
     demonstrated = "Yes" if case_studies_count > 0 else "No"
 
@@ -129,7 +173,6 @@ async def get_technique_details(stix_id: str):
         "case_studies_count": case_studies_count,
         "demonstrated": demonstrated
     }
-
 
 @app.get("/owasp")
 async def get_owasp_top10():
