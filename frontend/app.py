@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from pathlib import Path
 from PIL import Image
+import PyPDF2  # <-- Aggiunto per il parsing dei documenti
 
 # --- CONFIGURATION ---
 st.set_page_config(page_title="Janus Gateway - Security Core", page_icon="🛡️", layout="wide")
@@ -69,28 +70,57 @@ page = st.radio(
 if page == "Basi di Conoscenza":
     tab1, tab2 = st.tabs(["MITRE ATLAS™ Explorer", "OWASP LLM Top 10"])
 
-    # [IL RESTO DEL CODICE: KNOWLEDGE EXPLORER] ...
     with tab1:
         st.subheader("Adversarial Threat Landscape for AI Systems")
         try:
             response = requests.get(f"{API_URL}/techniques")
             techniques = response.json()
             col_list, col_details = st.columns([1, 2])
+
             with col_list:
                 tech_display = [f"{t['id']} - {t['name']}" for t in techniques]
                 selected_tech_name = st.selectbox("Seleziona una tecnica:", tech_display)
                 selected_index = tech_display.index(selected_tech_name)
                 selected_stix_id = techniques[selected_index]['stix_id']
+
             with col_details:
                 detail_res = requests.get(f"{API_URL}/techniques/{selected_stix_id}")
-                details = detail_res.json()
-                st.header(f"{details['id']}: {details['name']}")
-                st.markdown(
-                    f"**Demonstrated:** {details.get('demonstrated', 'N/A')} | **Mitigations:** {len(details.get('mitigations', [])) if details.get('mitigations') else 0}")
+                tech = detail_res.json()
+
+                st.header(f"{tech['id']}: {tech['name']}")
+
+                # --- DASHBOARD METADATI INTEGRATA ---
+                col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+                with col_m1:
+                    st.metric("Demonstrated", tech.get('demonstrated', 'N/A'))
+                with col_m2:
+                    st.metric("Case Studies", tech.get('case_studies_count', 0))
+                with col_m3:
+                    st.metric("Mitigations", tech.get('mitigations_count', 0))
+                with col_m4:
+                    st.metric("Platforms", len(tech.get('platforms', [])))
+
                 st.divider()
-                st.write(details.get('description', 'Nessuna descrizione disponibile.'))
-        except:
-            st.error("Connessione API fallita.")
+
+                # Informazioni Temporali e Tattiche
+                c1, c2 = st.columns(2)
+                with c1:
+                    st.markdown(f"**📅 Created:** {tech.get('created', 'N/A')}")
+                    st.markdown(f"**🔄 Last Modified:** {tech.get('modified', 'N/A')}")
+                with c2:
+                    tactics = tech.get('tactics', [])
+                    st.markdown(f"**🎯 Tactics:** {', '.join(tactics) if tactics else 'N/A'}")
+
+                st.subheader("Description")
+                st.write(tech.get('description', 'Nessuna descrizione disponibile.'))
+
+                if tech.get('mitigations'):
+                    st.subheader("🛡️ Mitigazioni Suggerite")
+                    for m in tech['mitigations']:
+                        st.info(m)
+
+        except Exception as e:
+            st.error(f"Connessione API fallita o errore nel caricamento: {e}")
 
     with tab2:
         st.subheader("Top 10 Critical Vulnerabilities for LLM Applications")
