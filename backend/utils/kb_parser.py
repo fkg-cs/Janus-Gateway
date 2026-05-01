@@ -4,7 +4,6 @@ from stix2 import MemoryStore, Filter  # <-- Aggiunto Filter qui
 
 def load_mitre_atlas():
     print("Caricamento Knowledge Base MITRE ATLAS...")
-    # Percorso del file che hai appena scaricato
     filepath = "../../knowledge_base/mitre_atlas.json"
 
     # Carichiamo il file nel MemoryStore della libreria stix2
@@ -13,14 +12,14 @@ def load_mitre_atlas():
 
     # Estraiamo tutte le Tecniche di Attacco usando stix2.Filter
     techniques = store.query([
-        Filter("type", "=", "attack-pattern")  # <-- Modificato qui
+        Filter("type", "=", "attack-pattern")
     ])
 
     print(f"✅ Ingestione completata: Trovate {len(techniques)} tecniche ATLAS.")
 
-    # Stampiamo un esempio per test (AML.T0051 - Indirect Prompt Injection)
+
     for t in techniques:
-        # Cerchiamo l'ID esterno associato (es. AML.T0051)
+
         # Attenzione: alcune tecniche potrebbero non avere external_references, gestiamo l'eccezione
         if hasattr(t, "external_references"):
             external_id = next((ext.external_id for ext in t.external_references if ext.source_name == "mitre-atlas"),

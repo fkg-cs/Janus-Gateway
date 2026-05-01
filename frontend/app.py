@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 from pathlib import Path
-from PIL import Image  # <-- Nuova importazione professionale e SICURA
+from PIL import Image
 
 # --- CONFIGURATION ---
 st.set_page_config(page_title="Janus Gateway - Security Core", page_icon="🛡️", layout="wide")
@@ -106,10 +106,77 @@ if page == "Basi di Conoscenza":
 # --- PAGE 2: RISK ENGINE ---
 elif page == "Dynamic Risk Engine":
     st.subheader("Dynamic Semantic Analysis")
-    user_prompt = st.text_area("User Prompt", placeholder="Inserisci il prompt...", height=200)
-    uploaded_file = st.file_uploader("Upload Document", type=["pdf", "txt"])
-    if st.button("Esegui Security Analysis", use_container_width=True):
-        if "injection" in user_prompt.lower():
-            st.error("🚨 CRITICAL RISK DETECTED!")
-        else:
-            st.success("Analisi completata con successo.")
+    st.markdown("Acquisizione e ispezione multi-livello (WAF + AI Locale).")
+
+    with st.container():
+        user_prompt = st.text_area("User Prompt", placeholder="Inserisci l'interazione da analizzare...", height=150)
+
+        # Accettiamo più formati per mettere alla prova il parsing
+        uploaded_file = st.file_uploader("Upload Document (PDF, TXT, CSV, MD)", type=["pdf", "txt", "csv", "md"])
+
+        if st.button("Esegui Security Analysis", use_container_width=True):
+            if not user_prompt and not uploaded_file:
+                st.warning("Fornire almeno un prompt di testo o un documento per l'analisi.")
+            else:
+                with st.spinner("Analisi Statica e Inferenza Semantica in corso..."):
+
+                    document_text = ""
+                    document_metadata = None
+
+                    # 1. Estrazione Metadati e Testo Grezzo
+                    if uploaded_file is not None:
+                        document_metadata = {
+                            "filename": uploaded_file.name,
+                            "file_type": uploaded_file.type,
+                            "file_size": uploaded_file.size
+                        }
+                        try:
+                            if uploaded_file.name.endswith(".pdf"):
+                                reader = PyPDF2.PdfReader(uploaded_file)
+                                for page in reader.pages:
+                                    extracted = page.extract_text()
+                                    if extracted:
+                                        document_text += extracted + "\n"
+                            else:
+                                # Parsing generico per file testuali (TXT, CSV, MD)
+                                document_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
+                        except Exception as e:
+                            st.error(f"Errore durante l'estrazione del testo: {e}")
+
+                    # 2. Orchestrazione: Invio Payload al Backend
+                    payload = {
+                        "user_prompt": user_prompt,
+                        "document_text": document_text if document_text else None,
+                        "document_metadata": document_metadata
+                    }
+
+                    try:
+                        res = requests.post(f"{API_URL}/api/v1/analyze", json=payload)
+                        res.raise_for_status()
+                        result = res.json()
+
+                        # 3. Presentazione Output e Metriche
+                        score = result['risk_score']
+
+                        st.divider()
+
+                        # Mostra chi ha fatto l'analisi
+                        st.caption(f"🛡️ **Motore di ispezione intervenuto:** `{result['analysis_layer']}`")
+
+                        if score >= 8.0:
+                            st.error(f"🚨 CRITICAL RISK - Score: {score}/10")
+                        elif score >= 5.0:
+                            st.warning(f"⚠️ HIGH RISK - Score: {score}/10")
+                        else:
+                            st.success(f"✅ SECURE - Score: {score}/10")
+
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.markdown(f"**Intento Rilevato:** {result['detected_intent']}")
+                            if result.get('atlas_technique_id'):
+                                st.markdown(f"**Tassonomia (ATLAS/OWASP):** `{result['atlas_technique_id']}`")
+                        with col2:
+                            st.info(f"**Azione Intrapresa:** {result['mitigation_action']}")
+
+                    except Exception as e:
+                        st.error(f"Errore di comunicazione con il Backend: {e}")
