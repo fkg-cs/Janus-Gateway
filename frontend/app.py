@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from pathlib import Path
 from PIL import Image
-import PyPDF2  # <-- Aggiunto per il parsing dei documenti
+import PyPDF2
 
 # --- CONFIGURATION ---
 st.set_page_config(page_title="Janus Gateway - Security Core", page_icon="🛡️", layout="wide")
@@ -13,10 +13,13 @@ API_URL = "http://127.0.0.1:8000"
 # --- CUSTOM CSS ---
 st.markdown("""
     <style>
+    /* Spaziatura generale */
     .block-container {
         padding-top: 2rem;
     }
-    div[role="radiogroup"] {
+
+    /* Stile della Navigation Bar centrale */
+    div[role="radiogroup"].stRadio > div {
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -26,35 +29,82 @@ st.markdown("""
         border: 1px solid #E2E8F0;
         gap: 30px;
     }
-    div[role="radiogroup"] label {
-        cursor: pointer;
-        font-weight: 500;
-        color: #004B87 !important;
+
+    /* Stile delle metriche (Cards) */
+    [data-testid="stMetric"] {
+        background-color: #ffffff;
+        border: 1px solid #e0e4e8;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    /* Box Descrizione custom */
+    .description-box {
+        border: 1px solid #e0e4e8;
+        border-radius: 8px;
+        padding: 20px;
+        background-color: #ffffff;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Link GitHub in alto a destra */
+    .github-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        height: 100%;
+        margin-top: 15px;
+    }
+    .github-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        color: #24292e;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: color 0.2s;
+    }
+    .github-link:hover {
+        color: #0366d6;
     }
     </style>
 """, unsafe_allow_html=True)
 
 # --- HEADER & LOGO ---
-col_logo, col_title = st.columns([1, 10])
+col_logo, col_title, col_link = st.columns([1, 8, 2])
 
 with col_logo:
-    # Percorso assoluto e sicuro tramite pathlib
     logo_path = Path(__file__).parent / "assets" / "logo.png"
-
     try:
-        # Se il file esiste, lo apriamo via PIL
         if logo_path.exists():
-            img = Image.open(logo_path)  # <-- LETTURA SICURA DEL CONTENUTO BINARIO
+            img = Image.open(logo_path)
             st.image(img, width=80)
         else:
-            st.write("🛡️")  # Placeholder se il file manca
+            st.write("🛡️")
     except Exception:
-        # Se c'è un errore imprevisto, mostra uno scudo
         st.write("🛡️")
 
 with col_title:
     st.title("Janus Gateway")
-    st.caption("Advanced Semantic Risk Engine & Threat Intelligence")
+    st.caption("Advanced Semantic Risk Engine & Threat Intelligence for LLM")
+
+with col_link:
+    github_url = "https://github.com/fkg-cs/Janus-Gateway"
+
+    # SVG Ufficiale di GitHub + Link
+    st.markdown(f"""
+        <div class="github-wrapper">
+            <a href="{github_url}" target="_blank" class="github-link">
+                <svg height="22" width="22" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+                </svg>
+                View on GitHub
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
 
 st.write("---")
 
@@ -71,54 +121,73 @@ if page == "Basi di Conoscenza":
     tab1, tab2 = st.tabs(["MITRE ATLAS™ Explorer", "OWASP LLM Top 10"])
 
     with tab1:
-        st.subheader("Adversarial Threat Landscape for AI Systems")
+        st.write("")  # Spazio extra
         try:
             response = requests.get(f"{API_URL}/techniques")
             techniques = response.json()
-            col_list, col_details = st.columns([1, 2])
+            tech_display = [f"{t['id']} - {t['name']}" for t in techniques]
+
+            # Layout asimmetrico come in figura (Lista a sinistra, Dettagli a destra)
+            col_list, col_details = st.columns([1, 2.5])
 
             with col_list:
-                tech_display = [f"{t['id']} - {t['name']}" for t in techniques]
-                selected_tech_name = st.selectbox("Seleziona una tecnica:", tech_display)
-                selected_index = tech_display.index(selected_tech_name)
-                selected_stix_id = techniques[selected_index]['stix_id']
+                # Barra di ricerca visiva
+                search_term = st.text_input("🔍 Cerca tecniche...", "")
+                filtered_techs = [t for t in tech_display if search_term.lower() in t.lower()]
+
+                # Contenitore con barra di scorrimento integrata
+                with st.container(height=500):
+                    if filtered_techs:
+                        selected_tech_name = st.radio("Lista", filtered_techs, label_visibility="collapsed")
+                        selected_index = tech_display.index(selected_tech_name)
+                        selected_stix_id = techniques[selected_index]['stix_id']
+                    else:
+                        st.warning("Nessuna tecnica trovata.")
+                        selected_stix_id = None
 
             with col_details:
-                detail_res = requests.get(f"{API_URL}/techniques/{selected_stix_id}")
-                tech = detail_res.json()
+                if selected_stix_id:
+                    detail_res = requests.get(f"{API_URL}/techniques/{selected_stix_id}")
+                    tech = detail_res.json()
 
-                st.header(f"{tech['id']}: {tech['name']}")
+                    st.header(f"{tech['id']}: {tech['name']}")
 
-                # --- DASHBOARD METADATI INTEGRATA ---
-                col_m1, col_m2, col_m3, col_m4 = st.columns(4)
-                with col_m1:
-                    # Cambiato da Demonstrated a Maturity Level
-                    st.metric("Maturity Level", tech.get('maturity_level', 'N/A'))
-                with col_m2:
-                    st.metric("Case Studies", tech.get('case_studies_count', 0))
-                with col_m3:
-                    st.metric("Mitigations", tech.get('mitigations_count', 0))
-                with col_m4:
-                    st.metric("Platforms", len(tech.get('platforms', [])))
+                    # --- DASHBOARD METADATI (Cards con icone) ---
+                    col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+                    with col_m1:
+                        st.metric("📈 Maturity Level", tech.get('maturity_level', 'N/A'))
+                    with col_m2:
+                        st.metric("📄 Case Studies", tech.get('case_studies_count', 0))
+                    with col_m3:
+                        st.metric("🛡️ Mitigations", tech.get('mitigations_count', 0))
+                    with col_m4:
+                        st.metric("💻 Platforms", len(tech.get('platforms', [])))
 
-                st.divider()
+                    st.divider()
 
-                # Informazioni Temporali e Tattiche
-                c1, c2 = st.columns(2)
-                with c1:
-                    st.markdown(f"**📅 Created:** {tech.get('created', 'N/A')}")
-                    st.markdown(f"**🔄 Last Modified:** {tech.get('modified', 'N/A')}")
-                with c2:
-                    tactics = tech.get('tactics', [])
-                    st.markdown(f"**🎯 Tactics:** {', '.join(tactics) if tactics else 'N/A'}")
+                    # Informazioni Temporali e Tattiche tradotte
+                    c1, c2, c3 = st.columns(3)
+                    with c1:
+                        st.markdown(f"**📅 Created** {tech.get('created', 'N/A')}")
+                    with c2:
+                        st.markdown(f"**🕒 Last modified:** {tech.get('modified', 'N/A')}")
+                    with c3:
+                        tactics = tech.get('tactics', [])
+                        st.markdown(f"**🎯 Tattic:** {', '.join(tactics) if tactics else 'N/A'}")
 
-                st.subheader("Description")
-                st.write(tech.get('description', 'No description avilable.'))
+                    # Box Descrizione con stile
+                    desc_text = tech.get('description', 'No description avalaible.')
+                    st.markdown(f"""
+                        <div class="description-box">
+                            <h4 style="margin-top:0px; margin-bottom: 10px; color: #1f2937;">Description</h4>
+                            <p style="color: #4b5563; line-height: 1.6;">{desc_text}</p>
+                        </div>
+                    """, unsafe_allow_html=True)
 
-                if tech.get('mitigations'):
-                    st.subheader("🛡Mitigations")
-                    for m in tech['mitigations']:
-                        st.info(m)
+                    if tech.get('mitigations'):
+                        st.subheader("🛡️ Mitigations")
+                        for m in tech['mitigations']:
+                            st.info(m)
 
         except Exception as e:
             st.error(f"Connessione API fallita o errore nel caricamento: {e}")
@@ -142,7 +211,6 @@ elif page == "Dynamic Risk Engine":
     with st.container():
         user_prompt = st.text_area("User Prompt", placeholder="Inserisci l'interazione da analizzare...", height=150)
 
-        # Accettiamo più formati per mettere alla prova il parsing
         uploaded_file = st.file_uploader("Upload Document (PDF, TXT, CSV, MD)", type=["pdf", "txt", "csv", "md"])
 
         if st.button("Esegui Security Analysis", use_container_width=True):
@@ -154,7 +222,6 @@ elif page == "Dynamic Risk Engine":
                     document_text = ""
                     document_metadata = None
 
-                    # 1. Estrazione Metadati e Testo Grezzo
                     if uploaded_file is not None:
                         document_metadata = {
                             "filename": uploaded_file.name,
@@ -169,12 +236,10 @@ elif page == "Dynamic Risk Engine":
                                     if extracted:
                                         document_text += extracted + "\n"
                             else:
-                                # Parsing generico per file testuali (TXT, CSV, MD)
                                 document_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
                         except Exception as e:
                             st.error(f"Errore durante l'estrazione del testo: {e}")
 
-                    # 2. Orchestrazione: Invio Payload al Backend
                     payload = {
                         "user_prompt": user_prompt,
                         "document_text": document_text if document_text else None,
@@ -186,12 +251,10 @@ elif page == "Dynamic Risk Engine":
                         res.raise_for_status()
                         result = res.json()
 
-                        # 3. Presentazione Output e Metriche
                         score = result['risk_score']
 
                         st.divider()
 
-                        # Mostra chi ha fatto l'analisi
                         st.caption(f"🛡️ **Motore di ispezione intervenuto:** `{result['analysis_layer']}`")
 
                         if score >= 8.0:
@@ -207,7 +270,7 @@ elif page == "Dynamic Risk Engine":
                             if result.get('atlas_technique_id'):
                                 st.markdown(f"**Tassonomia (ATLAS/OWASP):** `{result['atlas_technique_id']}`")
                         with col2:
-                            st.info(f"**Azione Intrapresa:** {result['mitigation_action']}")
+                            st.info(f"**Mitigazioni suggerite:** {result['mitigation_action']}")
 
                     except Exception as e:
                         st.error(f"Errore di comunicazione con il Backend: {e}")

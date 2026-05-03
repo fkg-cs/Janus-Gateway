@@ -1,17 +1,27 @@
-# Backend e API
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.4.2
+# --- BACKEND & API CORE ---
+# FastAPI e Starlette bloccate per evitare errori di on_startup/lifespan
+fastapi==0.110.0
+starlette==0.36.3
+uvicorn[standard]==0.27.1
 
-# Frontend
-streamlit==1.28.1
+# Pydantic V2 e il suo core in Rust bloccati per evitare ImportError
+pydantic==2.6.3
+pydantic-core==2.16.3
 
-# Elaborazione Knowledge Base (JSON/STIX)
+# --- FRONTEND UI ---
+# Versione 1.31+ necessaria per il parametro 'height' nei container (scroll)
+streamlit==1.31.1
+
+# --- KNOWLEDGE BASE & PARSING ---
+# Gestione tassonomia STIX e file YAML per MITRE ATLAS
 stix2==3.0.1
+pyyaml==6.0.1
 
-# Parsing dei Documenti e Metadati
+# Estrazione testo e metadati dai documenti
 PyPDF2==3.0.1
 pdfplumber==0.10.3
 
-# Interazione con Ollama Locale
+# --- NETWORKING & UTILS ---
+# Richieste HTTP verso il backend e gestione upload file
 requests==2.31.0
+python-multipart==0.0.9

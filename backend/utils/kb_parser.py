@@ -1,5 +1,5 @@
 import json
-from stix2 import MemoryStore, Filter  # <-- Aggiunto Filter qui
+from stix2 import MemoryStore, Filter
 
 
 def load_mitre_atlas():
