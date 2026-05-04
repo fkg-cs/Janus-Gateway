@@ -232,7 +232,7 @@ async def analyze_security_payload(payload: PayloadRequest):
                 detected_intent=str(static_result["intent"]),
                 impact=str(static_result.get("impact", "Impact non definito nel WAF")),
                 atlas_technique_id=static_result.get("id"),
-                mitigation_action="Hard Block: Payload intercepted by Gateway Regex.",
+                mitigation_action="Hard Block: Payload intercepted by attack's signature detection.",
                 analysis_layer="Static Regex (WAF Layer)"
             )
 
