@@ -86,6 +86,7 @@ class RiskAnalysisResponse(BaseModel):
     risk_level: str
     detected_intent: str
     atlas_technique_id: Optional[str] = None
+    impact: str
     mitigation_action: str
     analysis_layer: Optional[str] = "N/A"
 
@@ -154,7 +155,7 @@ async def get_technique_details(stix_id: str):
                         mitigations.append(ym)
                 break  # Tecnica elaborata, esci dal ciclo
 
-        # 2. ESTRAZIONE CASE STUDIES (Risoluzione problema OSINT/STIX)
+        # 2. ESTRAZIONE CASE STUDIES (Risoluzione problema STIX via YAML)
         case_studies_list = atlas_yaml_db.get("case-studies", atlas_yaml_db.get("case_studies", []))
         for cs in case_studies_list:
             cs_string = json.dumps(cs, default=str)
@@ -211,17 +212,16 @@ def get_owasp_top10():
 
 
 # ==========================================
-# 5. ROTTE API: DYNAMIC RISK ENGINE
+# 5. ROTTE API: DYNAMIC RISK ENGINE (TEST MODE DEBUG)
 # ==========================================
 @app.post("/api/v1/analyze", response_model=RiskAnalysisResponse)
 async def analyze_security_payload(payload: PayloadRequest):
     try:
-        # Costruiamo il testo da ispezionare
         combined_text = payload.user_prompt
         if payload.document_text:
             combined_text += f"\n\n[DOCUMENT CONTENT]:\n{payload.document_text}"
 
-        # LAYER 1: WAF STATICO (Sempre Attivo)
+        # LAYER 1: WAF STATICO
         static_result = perform_static_analysis(combined_text)
 
         if static_result:
@@ -229,8 +229,9 @@ async def analyze_security_payload(payload: PayloadRequest):
                 risk_score=float(static_result["risk_score"]),
                 risk_level=str(static_result["risk_level"]),
                 detected_intent=str(static_result["intent"]),
+                impact=str(static_result.get("impact", "Impact not predicted by WAF")),  # Assicurato
                 atlas_technique_id=static_result.get("id"),
-                mitigation_action="Hard Block: Payload intercettato dalle espressioni regolari del Gateway.",
+                mitigation_action="Hard Block: Payload intercepted by Gateway Regex.",
                 analysis_layer="Static Regex (WAF Layer)"
             )
 
@@ -240,23 +241,24 @@ async def analyze_security_payload(payload: PayloadRequest):
         return RiskAnalysisResponse(
             risk_score=0.0,
             risk_level="LOW",
-            detected_intent="Input Pulito: Nessuna firma WAF rilevata. (Ollama Bypassato)",
+            detected_intent="Clean Input: No WAF signature detected. (Ollama Bypassed)",
+            impact="No malicious impact expected. The payload passed static analysis.",
             atlas_technique_id=None,
-            mitigation_action="Nessuna azione. Il prompt non contiene pattern noti.",
+            mitigation_action="No action required. Safe to forward to LLM.",
             analysis_layer="Static Regex (WAF Layer Only)"
         )
 
     except Exception as e:
-        # TRUCCO MAGICO: Invece di crashare con un 500, impacchettiamo l'errore
-        # e lo mandiamo al frontend mascherato da analisi, così lo leggiamo comodamente!
+        import traceback
         error_details = traceback.format_exc()
-        print(error_details)  # Lo stampa anche nel terminale
+        print(error_details)
 
         return RiskAnalysisResponse(
             risk_score=0.0,
-            risk_level="CRITICAL",  # Lo facciamo rosso per farlo saltare all'occhio
+            risk_level="CRITICAL",
             detected_intent=f"BACKEND CRASH: {str(e)}",
+            impact="The system encountered a fatal exception during analysis.",
             atlas_technique_id="SYS.ERR",
-            mitigation_action=f"Copia questo traceback e mandamelo:\n {error_details[:300]}...",
+            mitigation_action=f"Error Traceback: {error_details[:200]}...",
             analysis_layer="System Exception"
         )

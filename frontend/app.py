@@ -57,6 +57,71 @@ with col_title:
 
 st.write("") # Spacer
 
+# ==========================================
+# DEEP LINKING: MODALITÀ KB ISOLATA (NEW WINDOW)
+# ==========================================
+query_params = st.query_params
+if "tech_id" in query_params:
+    tech_id = query_params["tech_id"]
+
+    # Pulsante per tornare alla home chiudendo la modalità isolata
+    if st.button("⬅️ Back to Janus Gateway (Clear Search)"):
+        st.query_params.clear()
+        st.rerun()
+
+    st.title(f"Threat Intelligence of {tech_id}")
+    st.divider()
+
+    try:
+        if tech_id.startswith("AML."):
+            # Ricerca in MITRE ATLAS
+            techs = requests.get(f"{API_URL}/techniques").json()
+            stix_id = next((t['stix_id'] for t in techs if t['id'] == tech_id), None)
+
+            if stix_id:
+                tech = requests.get(f"{API_URL}/techniques/{stix_id}").json()
+                st.subheader(f"{tech['id']}: {tech['name']}")
+
+                m1, m2, m3 = st.columns(3)
+                m1.metric("📈 Maturity Level", tech.get('maturity_level', 'N/A'))
+                m2.metric("📄 Case Studies", tech.get('case_studies_count', 0))
+                m3.metric("🛡️ Mitigations", tech.get('mitigations_count', 0))
+
+                st.markdown(f"""
+                    <div class="description-box">
+                        <h4 style="margin-top:0px; color: #1f2937;">Description</h4>
+                        <p style="color: #4b5563;">{tech.get('description', 'No description.')}</p>
+                    </div>
+                """, unsafe_allow_html=True)
+
+                if tech.get('mitigations'):
+                    st.subheader("🛡️ Mitigations")
+                    for m in tech['mitigations']: st.info(m)
+            else:
+                st.error("Technique not found in MITRE ATLAS database.")
+
+        elif tech_id.startswith("LLM"):
+            # Ricerca in OWASP
+            owasp_data = requests.get(f"{API_URL}/owasp").json()
+            # OWASP usa ID tipo LLM06:2023, cerchiamo con startswith
+            item = next((i for i in owasp_data if i['id'].startswith(tech_id)), None)
+
+            if item:
+                st.subheader(f"{item['id']} - {item['name']}")
+                st.write(item['description'])
+                st.error(f"**Impact:** {item['impact']}")
+                if "example" in item: st.warning(f"**Scenario:** {item['example']}")
+                if "mitigations" in item:
+                    st.markdown("**🛡️ Mitigations:**")
+                    for m in item['mitigations']: st.info(f"• {m}")
+            else:
+                st.error("Vulnerability not found in OWASP database.")
+    except Exception as e:
+        st.error(f"Impossibile collegarsi al backend per caricare i dati: {e}")
+
+    # ST.STOP() È CRITICO: Ferma l'esecuzione di Streamlit qui, nascondendo il resto dell'app
+    st.stop()
+# ==========================================
 
 # --- MAIN NAVIGATION (TABS) ---
 tab_kb, tab_engine = st.tabs(["Knowledge Bases", "Dynamic Risk Engine"])
@@ -215,13 +280,25 @@ with tab_engine:
                         else:
                             st.success(f"✅ SECURE - Score: {score}/10")
 
-                        col1, col2 = st.columns(2)
+                        col1, col2, col3 = st.columns(3)
+
                         with col1:
-                            st.markdown(f"**Detected Intent:** {result['detected_intent']}")
-                            if result.get('atlas_technique_id'):
-                                st.markdown(f"**Taxonomy (ATLAS/OWASP):** `{result['atlas_technique_id']}`")
+                            st.markdown(f"**Detected Intent:**\n{result['detected_intent']}")
+
+                            # Link alla Taxonomy (cliccabile come abbiamo impostato prima)
+                            atlas_id = result.get('atlas_technique_id')
+                            if atlas_id and atlas_id != "N/A":
+                                kb_link = f'<a href="/?tech_id={atlas_id}" target="_blank" style="text-decoration: none; color: #007bff; font-weight: bold;">{atlas_id} ↗</a>'
+                                st.markdown(f"**Taxonomy:** {kb_link}", unsafe_allow_html=True)
+                            else:
+                                st.markdown(f"**Taxonomy:** `N/A`")
+
                         with col2:
-                            st.info(f"**Suggested Mitigations:** {result['mitigation_action']}")
+                            st.markdown("**Potential Impact:**")
+                            st.write(f"{result.get('impact', 'N/A')}")
+
+                        with col3:
+                            st.info(f"**Mitigation:**\n{result['mitigation_action']}")
 
                     except requests.exceptions.RequestException as e:
                         st.error(f"Backend communication error: {e}")
