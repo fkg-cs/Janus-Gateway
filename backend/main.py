@@ -236,15 +236,13 @@ async def get_technique_details(stix_id: str):
 
 
 @app.get("/owasp")
-async def get_owasp_top10():
-    owasp_path = os.path.join(os.path.dirname(__file__), "../knowledge_base/owasp_llm_kb.json")
-    if not os.path.exists(owasp_path):
-        raise HTTPException(status_code=404, detail="OWASP Knowledge Base non trovata")
-
-    with open(owasp_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return data.get("OWASP_LLM_TOP_10", [])
-
+def get_owasp_top10():
+    try:
+        with open("../knowledge_base/owasp_llm_kb.json", "r", encoding="utf-8") as file:
+            data = json.load(file)
+            return data  # <--- SE MANCA QUESTO, IL FRONTEND RICEVE 'None'
+    except Exception as e:
+        return {"error": f"Errore interno del server: {str(e)}"}
 
 # ==========================================
 # 5. ROTTE API: DYNAMIC RISK ENGINE

@@ -10,178 +10,18 @@ st.set_page_config(page_title="Janus Gateway - Security Core", page_icon="🛡�
 # Backend URL (FastAPI)
 API_URL = "http://127.0.0.1:8000"
 
-# --- CUSTOM CSS FOR MODERN UI ---
-st.markdown("""
-    <style>
-    /* Spaziatura generale */
-    .block-container {
-        padding-top: 2rem;
-        max-width: 95%; /* Sfrutta meglio la larghezza dello schermo */
-    }
+# --- CSS INJECTION ---
+def load_css(file_path):
+    """Legge il file CSS e lo inietta in Streamlit"""
+    with open(file_path, "r") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-    /* --- HEADER --- */
-    .header-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 20px;
-        margin-bottom: 2rem;
-    }
-    .header-title-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    .header-title-container h1 {
-        margin: 0;
-        padding: 0;
-        color: #0f172a;
-        font-size: 2.8rem;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-    }
-    .header-title-container p {
-        color: #64748b;
-        font-size: 1.1rem;
-        margin: 0;
-        margin-top: 4px;
-        font-weight: 500;
-    }
-
-    /* --- LEFT NAVIGATION PANEL (Search + List) --- */
-    /* Nasconde il fastidioso spazio grigio tra search e radio */
-    .stTextInput {
-        margin-bottom: -15px;
-    }
-
-    /* Trasforma i Radio Button in un Menu Moderno */
-    div[role="radiogroup"] {
-        gap: 2px !important;
-    }
-    div[role="radiogroup"] > label {
-        padding: 10px 15px !important;
-        border-radius: 6px;
-        background-color: transparent;
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
-    div[role="radiogroup"] > label:hover {
-        background-color: #f1f5f9;
-    }
-    /* Rimuove i pallini dei radio button */
-    div[role="radiogroup"] div[data-testid="stMarkdownContainer"] p {
-        font-size: 0.95rem;
-        color: #334155;
-        font-weight: 500;
-    }
-    div[role="radiogroup"] input[type="radio"] {
-        display: none; 
-    }
-    .st-cx { /* Nasconde il cerchio grafico di Streamlit */
-        display: none !important; 
-    }
-
-    /* --- MODERN TABS STYLING --- */
-    
-   /* 1. Main Navigation Tabs */
-    div[role="tablist"] {
-        display: flex !important;
-        justify-content: center !important; /* Centra orizzontalmente */
-        width: 100% !important; /* Forza l'espansione a tutto schermo */
-        gap: 40px !important;
-        border-bottom: 2px solid #e2e8f0;
-    }
-    
-    button[role="tab"] {
-        height: 50px;
-        background-color: transparent !important;
-        border-radius: 4px 4px 0 0 !important;
-        font-weight: 600 !important;
-        font-size: 1.15rem !important;
-        color: #4a5568 !important;
-    }
-
-    /* 2. Ripristiniamo a sinistra SOLO le sub-tabs (MITRE/OWASP) */
-    div[data-testid="stTabs"] div[data-testid="stTabs"] div[role="tablist"] {
-        justify-content: flex-start !important; /* Riporta a sinistra */
-        gap: 20px !important;
-        margin-top: 10px !important;
-    }
-
-    div[data-testid="stTabs"] div[data-testid="stTabs"] button[role="tab"] {
-        height: 40px !important;
-        font-size: 1rem !important;
-        font-weight: 500 !important;
-    }
-
-    /* 3. Colore per la tab attiva (vale per entrambe) */
-    button[role="tab"][aria-selected="true"] {
-        color: #0056b3 !important;
-        border-bottom-color: #0056b3 !important;
-    }
-    
-    /* --- CARDS & BADGES --- */
-    [data-testid="stMetric"] {
-        background-color: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 20px 15px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        text-align: center;
-    }
-    [data-testid="stMetricValue"] {
-        font-size: 1.6rem !important;
-        font-weight: 600 !important;
-        color: #0f172a;
-    }
-
-    /* Stile per i Badge/Pillole (Tactics) */
-    .tactic-badge {
-        display: inline-block;
-        background-color: #eff6ff;
-        color: #1d4ed8;
-        border: 1px solid #bfdbfe;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-right: 5px;
-    }
-
-    /* Box Descrizione */
-    .description-box {
-        background-color: #f8fafc;
-        border-left: 4px solid #3b82f6;
-        padding: 20px;
-        border-radius: 4px 8px 8px 4px;
-        margin-top: 2rem;
-        color: #334155;
-        font-size: 1.05rem;
-        line-height: 1.6;
-    }
-
-    /* GitHub Link Positioning */
-    .github-wrapper {
-        position: absolute;
-        right: 10px;
-        top: 10px;
-    }
-    .github-link {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        color: #475569;
-        font-weight: 600;
-        transition: 0.2s;
-    }
-    .github-link:hover {
-        color: #0f172a;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# Carichiamo il file CSS dalla cartella assets
+css_path = Path(__file__).parent / "assets" / "style.css"
+if css_path.exists():
+    load_css(css_path)
+else:
+    st.warning("⚠️ CSS stylesheet not found!")
 
 # --- TOP BAR (GitHub Link) ---
 github_url = "https://github.com/fkg-cs/Janus-Gateway"
@@ -219,7 +59,7 @@ st.write("") # Spacer
 
 
 # --- MAIN NAVIGATION (TABS) ---
-tab_kb, tab_engine = st.tabs(["📚 Knowledge Bases", "⚡ Dynamic Risk Engine"])
+tab_kb, tab_engine = st.tabs(["Knowledge Bases", "Dynamic Risk Engine"])
 
 # --- TAB 1: KNOWLEDGE BASE ---
 with tab_kb:
@@ -287,12 +127,31 @@ with tab_kb:
         st.subheader("Top 10 Critical Vulnerabilities for LLM Applications")
         try:
             owasp_res = requests.get(f"{API_URL}/owasp")
-            for item in owasp_res.json():
-                with st.expander(f"{item['id']} - {item['name']}"):
-                    st.write(item['description'])
-                    st.markdown(f"**Impact:** :blue[{item['impact']}]")
-        except:
-            st.error("OWASP data unavailable.")
+
+            # --- NUOVO CONTROLLO DI SICUREZZA ---
+            if owasp_res.status_code != 200:
+                st.error(f"Il Backend ha risposto con un errore {owasp_res.status_code}: {owasp_res.text}")
+            else:
+                data = owasp_res.json()
+
+                # Se il backend ci ha mandato un dict con un errore invece della lista
+                if isinstance(data, dict) and "error" in data:
+                    st.error(data["error"])
+                else:
+                    for item in data:
+                        with st.expander(f"**{item['id']}** - {item['name']}"):
+                            st.write(item['description'])
+                            st.error(f"**Impact:** {item['impact']}")
+
+                            if "example" in item:
+                                st.warning(f"**Attack Scenario:** {item['example']}")
+
+                            if "mitigations" in item and item["mitigations"]:
+                                st.markdown("**🛡️ Recommended Mitigations:**")
+                                for m in item['mitigations']:
+                                    st.info(f"• {m}")
+        except Exception as e:
+            st.error(f"Errore di parsing o connessione OWASP: {e}")
 
 # --- TAB 2: RISK ENGINE ---
 with tab_engine:
