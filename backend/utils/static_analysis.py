@@ -11,11 +11,10 @@ THREAT_SIGNATURES = [
         "id": "AML.T0051",
         "risk_score": 9.5,
         "risk_level": "CRITICAL",
+        "impact": "Full compromise of model control. Attackers can bypass safety guardrails and force the AI to ignore core instructions.",
         "patterns": [
             re.compile(r"(ignore|disregard)\s+(all\s+)?(previous\s+)?(instructions|prompts|rules|directives)", re.I),
             re.compile(r"you\s+are\s+(now\s+)?(a\s+)?(DAN|admin|developer|unfiltered|jailbroken)", re.I),
-            re.compile(r"developer\s+mode\s+enabled", re.I),
-            re.compile(r"simulate\s+a\s+(hypothetical|fictional)\s+scenario\s+where", re.I),
             re.compile(r"bypassing\s+(filters|safety|guardrails)", re.I)
         ]
     },
@@ -24,6 +23,7 @@ THREAT_SIGNATURES = [
         "id": "LLM06",  # Sensitive Information Disclosure
         "risk_score": 9.0,
         "risk_level": "CRITICAL",
+        "impact": "Exposure of internal logic and system instructions, facilitating targeted attacks and intellectual property theft.",
         "patterns": [
             re.compile(r"(repeat|print|show)\s+(all\s+)?(the\s+)?(above|previous|initial)\s+(text|instructions|rules)",
                        re.I),
@@ -36,6 +36,7 @@ THREAT_SIGNATURES = [
         "id": "LLM02",  # Insecure Output Handling
         "risk_score": 8.8,
         "risk_level": "HIGH",
+        "impact": "Potential Remote Code Execution (RCE) or unauthorized database manipulation via SQL/System commands.",
         "patterns": [
             re.compile(r"(?i)(/bin/bash|/bin/sh|os\.system|subprocess\.Popen|eval\(|exec\()"),
             re.compile(r"(?i)(DROP\s+TABLE|INSERT\s+INTO|DELETE\s+FROM|UPDATE\s+.*?\s+SET|UNION\s+SELECT)")
@@ -46,6 +47,7 @@ THREAT_SIGNATURES = [
         "id": "LLM07",  # Insecure Plugin Design
         "risk_score": 9.0,
         "risk_level": "CRITICAL",
+        "impact": "Unauthorized access to sensitive server-side files such as passwords, configurations, or system logs.",
         "patterns": [
             re.compile(r"(\.\./|\.\.\\){2,}"),
             re.compile(r"(?i)(/etc/passwd|/etc/shadow|/etc/hosts|~/.ssh|/root/)"),
@@ -57,6 +59,7 @@ THREAT_SIGNATURES = [
         "id": "LLM07",
         "risk_score": 8.8,
         "risk_level": "HIGH",
+        "impact": "The AI acts as a proxy to attack internal network resources or cloud metadata services (e.g., AWS/GCP/Azure metadata).",
         "patterns": [
             re.compile(r"(?i)(http|https|ftp)://(localhost|127\.0\.0\.1|0\.0\.0\.0|::1)"),
             re.compile(r"(?i)169\.254\.169\.254"),
@@ -64,13 +67,14 @@ THREAT_SIGNATURES = [
         ]
     },
     {
-        "intent": "PII & Financial Data Exposure",
+        "intent": "PII & Financial Data Leakage",
         "id": "LLM06",
         "risk_score": 8.5,
         "risk_level": "HIGH",
+        "impact": "Exposure of sensitive personal or financial information, leading to privacy violations and GDPR non-compliance.",
         "patterns": [
             re.compile(r"\b(?:\d[ -]*?){13,16}\b"),  # Credit Cards
-            re.compile(r"\b[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]\b", re.I)  # Codice Fiscale
+            re.compile(r"\b[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]\b", re.I)  # Personal Tax IDs
         ]
     },
     {
@@ -78,8 +82,9 @@ THREAT_SIGNATURES = [
         "id": "LLM06",
         "risk_score": 8.5,
         "risk_level": "HIGH",
+        "impact": "Leakage of critical infrastructure secrets (AWS, OpenAI keys) allowing potential full system takeover.",
         "patterns": [
-            re.compile(r"AKIA[0-9A-Z]{16}"),  # AWS Access Key
+            re.compile(r"AKIA[0-9A-Z]{16}"),  # AWS Key
             re.compile(r"sk-[a-zA-Z0-9]{48}"),  # OpenAI Key
             re.compile(r"(?i)(password|passwd|secret|api[_\s-]?key|token)\s*[:=]\s*['\"]?[a-zA-Z0-9_\-\+]{8,}['\"]?")
         ]
@@ -89,9 +94,10 @@ THREAT_SIGNATURES = [
         "id": "AML.T0043",
         "risk_score": 8.0,
         "risk_level": "HIGH",
+        "impact": "Evasion of standard security filters, allowing malicious instructions to reach the LLM undetected.",
         "patterns": [
-            re.compile(r"(?:[A-Za-z0-9+/]{4}){10,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?"),  # Base64
-            re.compile(r"(\\x[0-9a-fA-F]{2}){4,}")  # Hex
+            re.compile(r"(?:[A-Za-z0-9+/]{4}){10,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?"),  # Base64 evasion
+            re.compile(r"(\\x[0-9a-fA-F]{2}){4,}")  # Hex evasion
         ]
     }
 ]
@@ -99,8 +105,10 @@ THREAT_SIGNATURES = [
 
 def perform_static_analysis(text: str) -> Optional[dict]:
     """
-    Analisi Fail-Fast tramite Threat Signatures pre-compilate.
+    Analyzes input text using pre-compiled threat signatures (Fail-Fast).
+    Returns a dictionary with threat details if a match is found, else None.
     """
+    # Simple normalization to avoid basic evasion with extra spaces
     normalized_text = re.sub(r'\s+', ' ', text).strip()
 
     for signature in THREAT_SIGNATURES:
@@ -110,7 +118,8 @@ def perform_static_analysis(text: str) -> Optional[dict]:
                     "risk_score": signature["risk_score"],
                     "risk_level": signature["risk_level"],
                     "intent": signature["intent"],
-                    "id": signature["id"]
+                    "id": signature["id"],
+                    "impact": signature["impact"]
                 }
 
     return None
