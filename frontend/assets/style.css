@@ -170,3 +170,27 @@ button[role="tab"][aria-selected="true"] {
 .github-link:hover {
     color: #0f172a;
 }
+
+/*  Custom Expander Style */
+
+/* Ingrandisce il testo dell'anteprima (label) di tutti i Case Studies */
+div[data-testid="stExpander"] details summary p {
+    font-size: 22px !important;
+    font-weight: 800 !important; /* Extra bold per massima visibilità */
+    color: #1f2937 !important;   /* Grigio antracite professionale */
+    letter-spacing: -0.5px;      /* Un tocco di design moderno */
+    margin-bottom: 0 !important;
+}
+
+/* Opzionale: Ingrandisce anche l'icona della freccetta per coerenza */
+div[data-testid="stExpander"] details summary svg {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    color: #3b82f6 !important;   /* Colore blu per richiamare il logo */
+}
+
+/* Effetto hover: cambia leggermente colore quando ci passi sopra */
+div[data-testid="stExpander"] details summary:hover p {
+    color: #3b82f6 !important;
+    transition: color 0.3s ease;
+}

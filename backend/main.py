@@ -126,6 +126,7 @@ async def get_technique_details(stix_id: str):
 
     mitigations = []
     case_studies_count = 0
+    case_studies_details = []
     maturity_level = "Theoretical"
 
     # ---  RICERCA NEL DATABASE YAML IN RAM ---
@@ -162,6 +163,59 @@ async def get_technique_details(stix_id: str):
             if atlas_id in cs_string:
                 case_studies_count += 1
 
+                # INIZIALIZZAZIONE SICURA (Esattamente come il tuo codice base)
+                c_name = cs.get("name", "Unknown Case Study")
+                c_summary = cs.get("summary", "No summary available.")
+                c_desc = cs.get("description", "No detailed description available.")
+
+                # TENTATIVO DI ARRICCHIMENTO PROTETTO
+                try:
+                    meta_badges = []
+                    c_date = cs.get("incident-date", cs.get("incident_date", ""))
+                    c_target = cs.get("target", "")
+                    c_actor = cs.get("actor", "")
+                    c_reporter = cs.get("reporter", "")
+
+                    if c_date: meta_badges.append(f"**📅 Date:** {c_date}")
+                    if c_target: meta_badges.append(f"**🎯 Target:** {c_target}")
+                    if c_actor: meta_badges.append(f"**👤 Actor:** {c_actor}")
+                    if c_reporter: meta_badges.append(f"**📢 Reporter:** {c_reporter}")
+
+                    meta_string = " | ".join(meta_badges) + "\n\n---\n\n" if meta_badges else ""
+
+                    # Ricerca delle procedure
+                    extracted_desc = cs.get("description", "")
+                    if not extracted_desc:
+                        raw_steps = cs.get("procedure", cs.get("procedure-steps", []))
+                        if isinstance(raw_steps, list):
+                            step_strings = []
+                            for i, step in enumerate(raw_steps, start=1):
+                                if isinstance(step, dict) and "description" in step:
+                                    # i è il numero dell'iterazione, str(step['description']) è il testo
+                                    step_strings.append(f"{i}) {str(step['description']).strip()}\n")
+
+                            if step_strings:
+                                # Uniamo le stringhe con un a capo
+                                extracted_desc = "**Attack Procedure:**\n\n" + "\n".join(step_strings)
+
+                    # Se abbiamo trovato procedure o metadati, sovrascriviamo la c_desc di default
+                    if extracted_desc:
+                        c_desc = meta_string + extracted_desc
+                    elif meta_string:
+                        c_desc = meta_string + "*(Detailed procedure not available in ATLAS database)*"
+
+                except Exception as e:
+                    # Se l'arricchimento fa i capricci, ignoriamo l'errore!
+                    # c_desc rimarrà "No detailed description available." e il server non crasherà.
+                    print(f"Ignorato errore formattazione nel Case Study {c_name}: {e}")
+
+                # APPEND GARANTITO (Esattamente come il tuo codice base)
+                case_studies_details.append({
+                    "name": c_name,
+                    "summary": c_summary,
+                    "description": c_desc
+                })
+
         if case_studies_count > 0:
             maturity_level = "Demonstrated"
 
@@ -197,6 +251,7 @@ async def get_technique_details(stix_id: str):
         "created": created_str,
         "modified": modified_str,
         "case_studies_count": case_studies_count,
+        "case_studies": case_studies_details,
         "maturity_level": maturity_level
     }
 

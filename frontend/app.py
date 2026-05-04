@@ -94,6 +94,20 @@ if "tech_id" in query_params:
                     </div>
                 """, unsafe_allow_html=True)
 
+                # --- VISUALIZZAZIONE CASE STUDIES ---
+                if tech.get('case_studies'):
+                    st.subheader("Real-World Case Studies")
+                    st.write("Documented examples of this technique used in real attacks:")
+                    for cs in tech['case_studies']:
+                        with st.expander(f"{cs['name']}", expanded=False):
+                            st.markdown(f"**Summary:** {cs.get('summary', 'No summary.')}")
+                            st.divider()
+                            st.write(cs.get('description', 'No description available.'))
+                elif tech.get('case_studies_count', 0) > 0:
+                    st.info("Case studies exist but detailed data was not loaded from YAML.")
+                else:
+                    st.info("No historical case studies found for this specific technique.")
+
                 if tech.get('mitigations'):
                     st.subheader("🛡️ Mitigations")
                     for m in tech['mitigations']: st.info(m)
@@ -185,6 +199,22 @@ with tab_kb:
                         st.subheader("🛡️ Suggested Mitigations")
                         for m in tech['mitigations']:
                             st.info(m)
+
+                    # --- NEW: VISUALIZZAZIONE CASE STUDIES NEL TAB ATLAS ---
+                    if tech.get('case_studies'):
+                        st.subheader("Real-World Case Studies")
+                        st.write("Historical examples of this technique deployed in the wild:")
+                        for cs in tech['case_studies']:
+                            with st.expander(f"{cs['name']}", expanded=False):
+                                st.markdown(f"**Summary:** {cs.get('summary', 'No summary.')}")
+                                st.divider()
+                                st.write(cs.get('description', 'No description available.'))
+                    elif tech.get('case_studies_count', 0) > 0:
+                        st.info("Case studies exist but detailed data was not loaded from YAML.")
+                    else:
+                        st.info("No historical case studies found for this specific technique.")
+
+
         except Exception as e:
             st.error(f"API connection failed: {e}")
 
