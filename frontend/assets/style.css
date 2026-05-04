@@ -69,9 +69,7 @@ div[role="radiogroup"] div[data-testid="stMarkdownContainer"] p {
 div[role="radiogroup"] input[type="radio"] {
     display: none;
 }
-.st-cx { /* Nasconde il cerchio grafico di Streamlit */
-    display: none !important;
-}
+
 
 /* --- MODERN TABS STYLING --- */
 

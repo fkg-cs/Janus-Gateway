@@ -5,7 +5,7 @@ from PIL import Image
 import PyPDF2
 
 # --- CONFIGURATION ---
-st.set_page_config(page_title="Janus Gateway - Security Core", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="Janus Gateway", page_icon="🛡️", layout="wide")
 
 # Backend URL (FastAPI)
 API_URL = "http://127.0.0.1:8000"
@@ -155,11 +155,9 @@ with tab_kb:
 
 # --- TAB 2: RISK ENGINE ---
 with tab_engine:
-    st.subheader("Dynamic Semantic Analysis")
-    st.markdown("Multi-layer inspection (WAF + Local AI Inference).")
-
+    st.subheader("Dynamic Risk Engine for LLM prompt")
     with st.container():
-        user_prompt = st.text_area("User Prompt", placeholder="Enter the interaction to analyze...", height=150)
+        user_prompt = st.text_area("User Prompt", placeholder="Insert prompt to analyze or upload document...", height=150)
         uploaded_file = st.file_uploader("Upload Document (PDF, TXT, CSV, MD)", type=["pdf", "txt", "csv", "md"])
 
         if st.button("Run Security Analysis", use_container_width=True):
@@ -167,6 +165,63 @@ with tab_engine:
                 st.warning("Please provide a prompt or a document for analysis.")
             else:
                 with st.spinner("Static Analysis & Semantic Inference in progress..."):
-                    # [Analysis Logic remains the same, just strings are translated]
-                    # ... (Parsing logic omitted for brevity, same as your original)
-                    st.info("Analysis results would appear here in English.")
+
+                    document_text = ""
+                    document_metadata = None
+
+                    # 1. Parsing del documento caricato
+                    if uploaded_file is not None:
+                        document_metadata = {
+                            "filename": uploaded_file.name,
+                            "file_type": uploaded_file.type,
+                            "file_size": uploaded_file.size
+                        }
+                        try:
+                            if uploaded_file.name.endswith(".pdf"):
+                                reader = PyPDF2.PdfReader(uploaded_file)
+                                for page in reader.pages:
+                                    extracted = page.extract_text()
+                                    if extracted:
+                                        document_text += extracted + "\n"
+                            else:
+                                document_text = uploaded_file.getvalue().decode("utf-8", errors="ignore")
+                        except Exception as e:
+                            st.error(f"Error during text extraction: {e}")
+
+                    # 2. Costruzione del Payload
+                    payload = {
+                        "user_prompt": user_prompt,
+                        "document_text": document_text if document_text else None,
+                        "document_metadata": document_metadata
+                    }
+
+                    # 3. Chiamata al Backend
+                    try:
+                        res = requests.post(f"{API_URL}/api/v1/analyze", json=payload)
+                        res.raise_for_status()
+                        result = res.json()
+
+                        score = result['risk_score']
+
+                        st.divider()
+
+                        st.caption(f"🛡️ **Inspection Engine triggered:** `{result['analysis_layer']}`")
+
+                        # 4. Visualizzazione dei Risultati
+                        if score >= 8.0:
+                            st.error(f"🚨 CRITICAL RISK - Score: {score}/10")
+                        elif score >= 5.0:
+                            st.warning(f"⚠️ HIGH RISK - Score: {score}/10")
+                        else:
+                            st.success(f"✅ SECURE - Score: {score}/10")
+
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.markdown(f"**Detected Intent:** {result['detected_intent']}")
+                            if result.get('atlas_technique_id'):
+                                st.markdown(f"**Taxonomy (ATLAS/OWASP):** `{result['atlas_technique_id']}`")
+                        with col2:
+                            st.info(f"**Suggested Mitigations:** {result['mitigation_action']}")
+
+                    except requests.exceptions.RequestException as e:
+                        st.error(f"Backend communication error: {e}")
