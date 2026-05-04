@@ -37,7 +37,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # --- CENTERED INLINE HEADER ---
-# Usiamo 4 colonne: 2 spaziatori esterni (1.5) e 2 centrali per logo (0.8) e testo (2.5)
+# 4 colonne: 2 spaziatori esterni (1.5) e 2 centrali per logo (0.8) e testo (2.5)
 spacer_left, col_logo, col_title, spacer_right = st.columns([1.5, 0.8, 2.5, 1.5])
 
 with col_logo:
@@ -128,7 +128,7 @@ with tab_kb:
         try:
             owasp_res = requests.get(f"{API_URL}/owasp")
 
-            # --- NUOVO CONTROLLO DI SICUREZZA ---
+            # --- CONTROLLI DI SICUREZZA X ERRORI ---
             if owasp_res.status_code != 200:
                 st.error(f"Il Backend ha risposto con un errore {owasp_res.status_code}: {owasp_res.text}")
             else:
