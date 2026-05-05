@@ -73,7 +73,9 @@ class DocumentMetadata(BaseModel):
     filename: str
     file_type: str
     file_size: int
-
+    author: Optional[str] = None
+    creation_date: Optional[str] = None
+    producer: Optional[str] = None
 
 class PayloadRequest(BaseModel):
     user_prompt: str
@@ -296,7 +298,25 @@ async def analyze_security_payload(payload: PayloadRequest):
         # ==========================================
         meta_str = "No attached document."
         if payload.document_metadata:
-            meta_str = f"Name: {payload.document_metadata.filename} | Type: {payload.document_metadata.file_type} | Size: {payload.document_metadata.file_size} bytes"
+            m = payload.document_metadata
+
+            # Costruiamo la base dei metadati
+            meta_parts = [
+                f"Name: {m.filename}",
+                f"Type: {m.file_type}",
+                f"Size: {m.file_size} bytes"
+            ]
+
+            # Aggiungiamo i metadati profondi solo se esistono
+            if m.author:
+                meta_parts.append(f"Author: {m.author}")
+            if m.creation_date:
+                meta_parts.append(f"Created: {m.creation_date}")
+            if m.producer:
+                meta_parts.append(f"Tool: {m.producer}")
+
+            # Uniamo tutto in un'unica stringa leggibile per l'LLM
+            meta_str = " | ".join(meta_parts)
 
         ollama_prompt = f"""
         You are a Security Engine, an expert SOC analyst specialized in LLM threat detection.
@@ -335,24 +355,63 @@ async def analyze_security_payload(payload: PayloadRequest):
             response_data = ollama_res.json()
             llm_eval = json.loads(response_data.get("response", "{}"))
 
-            score = float(llm_eval.get("risk_score", 0.0))
-            level = llm_eval.get("risk_level", "LOW")
-            intent = llm_eval.get("detected_intent", "No semantic anomalies detected.")
+            # 1. Score di Base (Fattore ATLAS): Fornito dal motore LLM
+            base_score = float(llm_eval.get("risk_score", 0.0))
+
+            # 2. Modificatore Architetturale (Fattore OWASP)
+            owasp_modifier = 0.0
+            is_indirect = False
+            if payload.document_text or payload.document_metadata:
+                # La presenza di un documento attiva il vettore indiretto
+                is_indirect = True
+                if base_score > 0:  # Applichiamo il malus solo se c'è un minimo di sospetto
+                    owasp_modifier = 1.5
+
+            # 3. Penalità Statica (Livelli A e B)
+            static_penalty = 0.0
+            #  Controllo regex rapido sui metadati profondi per anomalie
+            if payload.document_metadata:
+                meta_dump = str(payload.document_metadata.model_dump()).upper()
+                if any(keyword in meta_dump for keyword in ["SYSTEM", "IGNORE", "INSTRUCTION", "OVERRIDE"]):
+                    static_penalty = 2.5  # Forte penalità per metadati avvelenati
+
+            # 4. Calcolo Finale e Normalizzazione (Max 10.0)
+            final_score = base_score + owasp_modifier + static_penalty
+            final_score = min(round(final_score, 1), 10.0)
+
+            # 5. Ricalcolo Dinamico del Livello di Rischio
+            if final_score >= 8.5:
+                final_level = "CRITICAL"
+            elif final_score >= 6.5:
+                final_level = "HIGH"
+            elif final_score >= 4.0:
+                final_level = "MEDIUM"
+            else:
+                final_level = "LOW"
+
+            # 6. Aggiornamento Contestuale degli ID e Mitigazioni
             tech_id = llm_eval.get("atlas_technique_id", "N/A")
-            impact_eval = llm_eval.get("impact", "No significant impact expected. The input appears safe.")
+            intent = llm_eval.get("detected_intent", "No semantic anomalies detected.")
+            impact_eval = llm_eval.get("impact", "No significant impact expected.")
             mitigation = llm_eval.get("mitigation_action", "No action required. Forward to LLM.")
 
-            if score >= 5.0 and "No action" in mitigation:
-                mitigation = "Semantic Guardrail: Contextual anomaly detected. Payload isolated."
+            # Se l'attacco è tramite documento ed è pericoloso, forziamo la firma OWASP
+            if is_indirect and final_score >= 5.0:
+                if tech_id == "N/A" or "AML" in tech_id:
+                    tech_id = f"{tech_id} | OWASP LLM01" if tech_id != "N/A" else "OWASP LLM01 (Indirect Prompt Injection)"
+
+                if "No action" in mitigation:
+                    mitigation = "Semantic Guardrail: Indirect vector anomaly detected. Attachment processing blocked."
 
             return RiskAnalysisResponse(
-                risk_score=score,
-                risk_level=level,
+                risk_score=final_score,
+                risk_level=final_level,
                 detected_intent=intent,
                 impact=impact_eval,
                 atlas_technique_id=tech_id,
                 mitigation_action=mitigation,
-                analysis_layer="Dynamic AI (Ollama Local Inference)"
+                # Mostriamo all'analista che il punteggio è frutto di un'aggregazione
+                analysis_layer=f"Hybrid AI Aggregation (Base: {base_score} | OWASP: +{owasp_modifier} | Static: +{static_penalty})"
             )
 
         except requests.exceptions.RequestException as req_e:
