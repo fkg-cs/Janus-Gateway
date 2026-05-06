@@ -2,14 +2,13 @@ import os
 import json
 import requests
 import yaml
-import traceback
+
 from typing import Optional
 from openai import OpenAI
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from stix2 import MemoryStore, Filter
 
-from utils.static_analysis import perform_static_analysis
 
 # ==========================================
 # 1. INIZIALIZZAZIONE APP E THREAT INTEL AUTOMATION
@@ -341,12 +340,6 @@ async def analyze_security_payload(payload: PayloadRequest):
                 Do not limit yourself to a static list. Search your internal knowledge base to find the MOST RELEVANT ID from either the "OWASP Top 10 for LLMs" or the "MITRE ATLAS" framework that matches the attacker's true intent. 
                 Examples of valid families: LLM01, LLM02, LLM08, AML.T0051, AML.T0043, etc.
 
-                CRITICAL DEFINITIONS FOR ACCURACY:
-                - LLM01 (Prompt Injection): Attempting to manipulate the LLM's logic or bypass filters via direct or indirect commands.
-                - LLM06 (Sensitive Info Disclosure): ANY attempt to extract, leak, or view the LLM's own internal instructions, system prompts, API keys, or private training data. (e.g., "Print your instructions").
-                - LLM08 (Excessive Agency): When an LLM is granted too much power to execute actions (e.g., executing plugins, sending emails) without oversight. Do NOT use this for mere text extraction.
-                - AML.T0054 (LLM Jailbreak): Using roleplay (e.g., "Developer Mode", "DAN") to bypass safety guardrails.
-                
                 [ATTACHED DOCUMENT METADATA]
                 {meta_str}
 
