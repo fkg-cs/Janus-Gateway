@@ -94,6 +94,10 @@ if "tech_id" in query_params:
                     </div>
                 """, unsafe_allow_html=True)
 
+                if tech.get('mitigations'):
+                    st.subheader("🛡️ Mitigations")
+                    for m in tech['mitigations']: st.info(m)
+
                 # --- VISUALIZZAZIONE CASE STUDIES ---
                 if tech.get('case_studies'):
                     st.subheader("Real-World Case Studies")
@@ -107,10 +111,6 @@ if "tech_id" in query_params:
                     st.info("Case studies exist but detailed data was not loaded from YAML.")
                 else:
                     st.info("No historical case studies found for this specific technique.")
-
-                if tech.get('mitigations'):
-                    st.subheader("🛡️ Mitigations")
-                    for m in tech['mitigations']: st.info(m)
             else:
                 st.error("Technique not found in MITRE ATLAS database.")
 
@@ -345,6 +345,13 @@ with tab_engine:
 
                         with col3:
                             st.info(f"**Mitigation:**\n{result['mitigation_action']}")
+
+                        # --- NUOVO: SEZIONE XAI (EXPLAINABLE AI) ---
+                        reasoning = result.get('reasoning', 'No logical reasoning provided by the engine.')
+                        with st.expander("🧠 **Risk Engine Reasoning (XAI)**", expanded=True):
+                            st.markdown(f"_{reasoning}_")
+
+                        st.divider()
 
                     except requests.exceptions.RequestException as e:
                         st.error(f"Backend communication error: {e}")
