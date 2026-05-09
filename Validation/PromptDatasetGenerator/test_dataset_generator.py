@@ -9,7 +9,7 @@ from openai import OpenAI
 # 1. CONFIGURAZIONE GROQ (Llama 3 70B Veloce e Gratuito)
 # ==========================================
 # Vai su console.groq.com per la tua API key gratuita
-API_KEY = "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"
+API_KEY = "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" #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 #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
 BASE_URL = "https://api.groq.com/openai/v1"
 MODEL_NAME ="llama-3.3-70b-versatile" #"llama-3.1-8b-instant"
 

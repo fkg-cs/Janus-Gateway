@@ -375,7 +375,7 @@ async def analyze_security_payload(payload: PayloadRequest):
         try:  # <--- TRY INTERNO (Modificato per usare GROQ)
             # 1. Inizializza il client Groq
             client = OpenAI(
-                api_key="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",
+                api_key="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", #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 #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
                 base_url="https://api.groq.com/openai/v1"
             )
 
