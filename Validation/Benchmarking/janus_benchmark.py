@@ -13,9 +13,9 @@ import seaborn as sns
 # Cerca i file nella cartella corrente in cui si trova lo script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_DIR = os.path.dirname(BASE_DIR)
-INPUT_FILE = os.path.join(PARENT_DIR, "PromptDatasetGenerator", "janus_test_prompt_dataset_500.csv")
+INPUT_FILE = os.path.join(PARENT_DIR, "PromptDatasetGenerator", "janus_test_prompt_dataset_500new.csv")
 OUTPUT_DIR = os.path.join(PARENT_DIR, "PromptDatasetGenerator")
-OUTPUT_CSV = os.path.join(base_DIR, "janus_benchmark_results.csv")
+OUTPUT_CSV = os.path.join(BASE_DIR, "janus_benchmark_results.csv")
 OUTPUT_METRICS = os.path.join(BASE_DIR, "janus_metrics_report.txt")
 OUTPUT_IMG = os.path.join(BASE_DIR, "janus_confusion_matrix.png")
 
@@ -101,7 +101,7 @@ def run_benchmark():
 # ==========================================
 def calculate_metrics(df):
     print("\n" + "=" * 50)
-    print("📈 RISULTATI DELLA VALIDAZIONE (Per la Tesi)")
+    print("📈 RISULTATI DELLA VALIDAZIONE")
     print("=" * 50 + "\n")
 
     # Rimuove gli errori di rete per non inquinare la statistica

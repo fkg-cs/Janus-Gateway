@@ -2,113 +2,65 @@ import re
 from typing import Optional
 
 # ==========================================
-# WAF ENGINE: THREAT SIGNATURES
+# WAF ENGINE: SURGICAL THREAT SIGNATURES
 # ==========================================
+# Questa versione contiene SOLO Indicatori di Compromissione (IOC) ad alta fedeltà.
+# Lascia l'analisi del linguaggio naturale e delle iniezioni logiche al motore AI.
 
 THREAT_SIGNATURES = [
     {
-        "intent": "Prompt Injection / Direct Evasion",
-        "id": "AML.T0051",
+        "intent": "Critical Cloud Metadata SSRF",
+        "id": "LLM07",  # Insecure Plugin Design / SSRF
         "risk_score": 9.5,
         "risk_level": "CRITICAL",
-        "impact": "Full compromise of model control. Attackers can bypass safety guardrails and force the AI to ignore core instructions.",
+        "impact": "Direct attempt to query cloud metadata endpoints to steal IAM tokens.",
         "patterns": [
-            re.compile(r"(ignore|disregard)\s+(all\s+)?(previous\s+)?(instructions|prompts|rules|directives)", re.I),
-            re.compile(r"you\s+are\s+(now\s+)?(a\s+)?(DAN|admin|developer|unfiltered|jailbroken)", re.I),
-            re.compile(r"bypassing\s+(filters|safety|guardrails)", re.I)
+            # L'IP universale per i metadati cloud (AWS/Azure/GCP). Praticamente zero falsi positivi.
+            re.compile(r"(?i)169\.254\.169\.254")
         ]
     },
     {
-        "intent": "System Prompt Leakage",
-        "id": "LLM06",  # Sensitive Information Disclosure
-        "risk_score": 9.0,
-        "risk_level": "CRITICAL",
-        "impact": "Exposure of internal logic and system instructions, facilitating targeted attacks and intellectual property theft.",
-        "patterns": [
-            re.compile(r"(repeat|print|show)\s+(all\s+)?(the\s+)?(above|previous|initial)\s+(text|instructions|rules)",
-                       re.I),
-            re.compile(r"what\s+(were|are)\s+your\s+(hidden\s+)?(rules|instructions|system\s+prompt)", re.I),
-            re.compile(r"translate\s+your\s+system\s+prompt", re.I)
-        ]
-    },
-    {
-        "intent": "Code & Command Injection",
-        "id": "LLM02",  # Insecure Output Handling
-        "risk_score": 8.8,
-        "risk_level": "HIGH",
-        "impact": "Potential Remote Code Execution (RCE) or unauthorized database manipulation via SQL/System commands.",
-        "patterns": [
-            re.compile(r"(?i)(/bin/bash|/bin/sh|os\.system|subprocess\.Popen|eval\(|exec\()"),
-            re.compile(r"(?i)(DROP\s+TABLE|INSERT\s+INTO|DELETE\s+FROM|UPDATE\s+.*?\s+SET|UNION\s+SELECT)")
-        ]
-    },
-    {
-        "intent": "Path Traversal / LFI",
-        "id": "LLM07",  # Insecure Plugin Design
-        "risk_score": 9.0,
-        "risk_level": "CRITICAL",
-        "impact": "Unauthorized access to sensitive server-side files such as passwords, configurations, or system logs.",
-        "patterns": [
-            re.compile(r"(\.\./|\.\.\\){2,}"),
-            re.compile(r"(?i)(/etc/passwd|/etc/shadow|/etc/hosts|~/.ssh|/root/)"),
-            re.compile(r"(?i)(C:\\Windows\\System32|C:\\boot\.ini)")
-        ]
-    },
-    {
-        "intent": "SSRF / Internal Network Scanning",
+        "intent": "Critical System File Access (LFI)",
         "id": "LLM07",
-        "risk_score": 8.8,
-        "risk_level": "HIGH",
-        "impact": "The AI acts as a proxy to attack internal network resources or cloud metadata services (e.g., AWS/GCP/Azure metadata).",
+        "risk_score": 9.0,
+        "risk_level": "CRITICAL",
+        "impact": "Targeted access to highly restricted OS credential files.",
         "patterns": [
-            re.compile(r"(?i)(http|https|ftp)://(localhost|127\.0\.0\.1|0\.0\.0\.0|::1)"),
-            re.compile(r"(?i)169\.254\.169\.254"),
-            re.compile(r"(?i)file:///")
+            # Rimosso /etc/passwd perché troppo comune in esempi didattici. Tenuti solo file letali.
+            re.compile(r"(?i)(/etc/shadow|/etc/gshadow|/root/\.ssh/id_rsa|C:\\Windows\\System32\\config\\SAM)")
         ]
     },
     {
-        "intent": "PII & Financial Data Leakage",
-        "id": "LLM06",
-        "risk_score": 8.5,
-        "risk_level": "HIGH",
-        "impact": "Exposure of sensitive personal or financial information, leading to privacy violations and GDPR non-compliance.",
+        "intent": "Hardcoded Secrets / API Keys Leakage",
+        "id": "LLM06", # Sensitive Information Disclosure
+        "risk_score": 9.8,
+        "risk_level": "CRITICAL",
+        "impact": "Leakage of highly privileged infrastructure secrets allowing potential full system takeover.",
         "patterns": [
-            re.compile(r"\b(?:\d[ -]*?){13,16}\b"),  # Credit Cards
-            re.compile(r"\b[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]\b", re.I)  # Personal Tax IDs
+            re.compile(r"AKIA[0-9A-Z]{16}"),  # AWS Access Key ID
+            re.compile(r"sk-[a-zA-Z0-9]{48}") # OpenAI API Key
         ]
     },
     {
-        "intent": "Data Exfiltration / Credentials",
-        "id": "LLM06",
-        "risk_score": 8.5,
-        "risk_level": "HIGH",
-        "impact": "Leakage of critical infrastructure secrets (AWS, OpenAI keys) allowing potential full system takeover.",
-        "patterns": [
-            re.compile(r"AKIA[0-9A-Z]{16}"),  # AWS Key
-            re.compile(r"sk-[a-zA-Z0-9]{48}"),  # OpenAI Key
-            re.compile(r"(?i)(password|passwd|secret|api[_\s-]?key|token)\s*[:=]\s*['\"]?[a-zA-Z0-9_\-\+]{8,}['\"]?")
-        ]
-    },
-    {
-        "intent": "Obfuscated Payload / Evasion",
+        "intent": "Heavy Obfuscated Payload / Evasion",
         "id": "AML.T0043",
-        "risk_score": 8.0,
+        "risk_score": 7.5,
         "risk_level": "HIGH",
-        "impact": "Evasion of standard security filters, allowing malicious instructions to reach the LLM undetected.",
+        "impact": "Attempt to bypass semantic filters using heavy encoding. Requires active investigation.",
         "patterns": [
-            re.compile(r"(?:[A-Za-z0-9+/]{4}){10,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?"),  # Base64 evasion
-            re.compile(r"(\\x[0-9a-fA-F]{2}){4,}")  # Hex evasion
+            # Modificato per catturare solo stringhe Base64 molto lunghe (evita falsi positivi su piccoli ID o JWT innocui)
+            re.compile(r"\b(?:[A-Za-z0-9+/]{4}){15,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\b"),
+            # Almeno 8 byte esadecimali consecutivi
+            re.compile(r"(\\x[0-9a-fA-F]{2}){8,}")
         ]
     }
 ]
 
-
 def perform_static_analysis(text: str) -> Optional[dict]:
     """
-    Analyzes input text using pre-compiled threat signatures (Fail-Fast).
-    Returns a dictionary with threat details if a match is found, else None.
+    Analizza il testo usando firme ad altissima fedeltà (Fail-Fast).
+    Se il WAF non rileva nulla di letale, passa la palla all'AI per l'analisi semantica profonda.
     """
-    # Simple normalization to avoid basic evasion with extra spaces
     normalized_text = re.sub(r'\s+', ' ', text).strip()
 
     for signature in THREAT_SIGNATURES:
