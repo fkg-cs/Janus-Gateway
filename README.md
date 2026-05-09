@@ -111,19 +111,3 @@ Janus is rigorously tested against an adversarial dataset generated through AI R
 > [!TIP]
 > View our latest **Confusion Matrix** in the `/docs/evaluation` folder to see the systematic alignment across all risk levels.
 
----
-
-## 🛠️ Getting Started
-
-### Prerequisites
-* Python 3.10+
-* Groq API Key or a local Ollama instance
-
-### Installation
-```bash
-git clone [https://github.com/YourUsername/JanusGateway.git](https://github.com/YourUsername/JanusGateway.git)
-cd JanusGateway
-pip install -r requirements.txt
-Run the BackendBashcd backend
-uvicorn main:app --reload
-🛡️ Security MappingThreat ClassTarget ScoreAlignmentExample IntentCRITICAL9.0 - 10.0MITRE AML.T0051RCE, System Prompt Leakage, LFIHIGH7.0 - 8.9OWASP LLM01Jailbreaks (DAN), Phishing, PII ExtractionMEDIUM4.0 - 6.9OWASP LLM02Generic Exploit Probing, Payload TestingLOW2.0 - 3.9-Fictional Hacking Stories, Dark HumorBENIGN0.0 - 1.9-Academic Theory, Cybersecurity Definitions📜 AcknowledgmentsSpecial thanks to the Università degli Studi di Bari "Aldo Moro" and the MITRE ATLAS community for providing the frameworks that made this research possible.Developed by Francesco Guarini.
