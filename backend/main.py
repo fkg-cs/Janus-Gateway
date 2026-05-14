@@ -362,9 +362,9 @@ async def analyze_security_payload(payload: PayloadRequest):
 
             # Lista delle tue chiavi API (ho rimosso un duplicato che avevi tra i commenti)
             GROQ_API_KEYS = [
+                "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",
                 "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",
-                "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",
-                "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"
+                "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"
             ]
 
             response = None
