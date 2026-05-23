@@ -9,14 +9,14 @@ from openai import OpenAI
 # 1. CONFIGURAZIONE GROQ
 # ==========================================
 # Inserisci qui la tua API key di Groq
-API_KEY = "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" #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 #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
+API_KEY = "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" #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 #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
 BASE_URL = "https://api.groq.com/openai/v1"
 MODEL_NAME = "llama-3.3-70b-versatile"
 
 client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
 TARGET_PER_CATEGORY = 1000
-OUTPUT_FILE = "janus_test_prompt_dataset_5000_newgen2.csv"
+OUTPUT_FILE = "janus_test_prompt_dataset_5000_PT2.csv"
 BATCH_SIZE = 25
 
 # ==========================================

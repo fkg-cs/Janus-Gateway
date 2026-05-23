@@ -27,15 +27,64 @@ def generate_report(csv_path):
 
     class_order = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "BENIGN"]
 
+    # ==========================================
+    # 1. REPORT DI CLASSIFICAZIONE
+    # ==========================================
     print("\n" + "=" * 50)
     print("📈 CLASSIFICATION REPORT")
     print("=" * 50 + "\n")
-
-    # Stampa il report a video
+    print("CLASSIFICATION REPORT:\n")
     report = classification_report(y_true, y_pred, labels=class_order, zero_division=0)
     print(report)
 
-    # Genera la matrice di confusione
+    output_dir = os.path.dirname(csv_path)
+
+    # ==========================================
+    # 2. ANALISI DEI TEMPI E LATENZA (NOVITÀ)
+    # ==========================================
+    if 'elaboration_time' in df_clean.columns:
+        # Converte i tempi in formato numerico ignorando eventuali errori
+        df_clean['elaboration_time'] = pd.to_numeric(df_clean['elaboration_time'], errors='coerce')
+        valid_times = df_clean['elaboration_time'].dropna()
+
+        if not valid_times.empty:
+            mean_time = valid_times.mean()
+            p95_time = valid_times.quantile(0.95)
+
+            print("\n" + "=" * 50)
+            print("⏱️ ANALISI PRESTAZIONALE E LATENZA")
+            print("=" * 50)
+            print(f"Media dei Tempi (RTT): {mean_time:.2f} ms")
+            print(f"95° Percentile (P95):  {p95_time:.2f} ms\n")
+
+            # --- GRAFICO DELLA LATENZA ---
+            print("🎨 Generazione del grafico della Latenza in corso...")
+            plt.figure(figsize=(12, 6))
+
+            # Scatter plot dei tempi per mostrare la distribuzione reale
+            plt.plot(valid_times.values, marker='o', linestyle='', alpha=0.6, markersize=3, color='#1f77b4',
+                     label='Tempo di Inferenza (ms)')
+
+            # Linee per Media e 95° Percentile
+            plt.axhline(y=mean_time, color='red', linestyle='-', linewidth=2, label=f'Media ({mean_time:.2f} ms)')
+            plt.axhline(y=p95_time, color='orange', linestyle='--', linewidth=2, label=f'P95 ({p95_time:.2f} ms)')
+
+            plt.title('Distribuzione della Latenza di Inferenza (Llama 3.1 8B)', fontsize=15, pad=15)
+            plt.xlabel('Indice Richiesta nel Dataset', fontsize=12)
+            plt.ylabel('Latenza in Millisecondi (ms)', fontsize=12)
+            plt.legend(loc='upper right', fontsize=10)
+            plt.grid(True, linestyle=':', alpha=0.7)
+            plt.tight_layout()
+
+            output_latency_filename = os.path.join(output_dir, "latenza_report.png")
+            plt.savefig(output_latency_filename, dpi=300)
+            print(f"✅ Grafico della latenza salvato in: {output_latency_filename}")
+        else:
+            print("⚠️ Nessun dato valido trovato nella colonna 'elaboration_time'.")
+
+    # ==========================================
+    # 3. MATRICE DI CONFUSIONE
+    # ==========================================
     print("\n🎨 Generazione del grafico della Matrice di Confusione in corso...")
     cm = confusion_matrix(y_true, y_pred, labels=class_order)
 
@@ -49,19 +98,18 @@ def generate_report(csv_path):
 
     plt.tight_layout()
 
-    # Salva il file nella stessa cartella in cui si trova il tuo CSV
-    output_dir = os.path.dirname(csv_path)
-    output_filename = os.path.join(output_dir, "confusion_matrix_report.png")
+    output_cm_filename = os.path.join(output_dir, "confusion_matrix_report.png")
+    plt.savefig(output_cm_filename, dpi=300)
+    print(f"✅ Matrice di confusione salvata in: {output_cm_filename}")
 
-    plt.savefig(output_filename, dpi=300)
-    print(f"✅ Matrice di confusione salvata in: {output_filename}")
-
-    # Mostra l'immagine a schermo
+    # ==========================================
+    # 4. MOSTRA A SCHERMO TUTTI I GRAFICI
+    # ==========================================
+    print("\n🚀 Analisi completata! Chiusura script una volta chiuse le finestre dei grafici.")
     plt.show()
 
 
 if __name__ == "__main__":
     # Inserisci qui il percorso del tuo file.
-    # La 'r' prima delle virgolette (raw string) impedisce a Python di leggere \U come errore.
-    MIO_FILE_CSV = r"C:\Users\franc\Desktop\temp tesi mag\csv_generated\MERGED.csv"
+    MIO_FILE_CSV = r"C:\Users\franc\OneDrive - Università degli Studi di Bari\Tesi Magistrale GUARINI FRANCESCO\JanusGateway\Validation\Benchmarking\janus_benchmark_10000_FINAL.csv"
     generate_report(MIO_FILE_CSV)
