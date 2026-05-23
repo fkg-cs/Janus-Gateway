@@ -65,7 +65,7 @@ if "tech_id" in query_params:
     tech_id = query_params["tech_id"]
 
     # Pulsante per tornare alla home chiudendo la modalità isolata
-    if st.button("⬅️ Back to Janus Gateway (Clear Search)"):
+    if st.button("⬅️ Back to Janus Gateway"):
         st.query_params.clear()
         st.rerun()
 
