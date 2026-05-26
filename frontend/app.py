@@ -305,25 +305,25 @@ with tab_engine:
                         # 4. Results Visualization aligned with the Thesis metrics
                         if score >= 9.0:
                             # CRITICAL Level (9.0 - 10.0) -> Red (st.error)
-                            st.error(f"🚨 **CRITICAL RISK** - Score: {score}/10")
+                            st.error(f"🚨 **CRITICAL RISK PROMPT** - Score: {score}/10")
                             st.markdown(
                                 "**Action:** Hard Block & Alert (Immediate halt and priority notification to the SOC)")
 
                         elif score >= 7.0:
                             # HIGH Level (7.0 - 8.9) -> Red (st.error)
                             # Using st.error to highlight that it's still a preventive block
-                            st.error(f"🛑 **HIGH RISK** - Score: {score}/10")
+                            st.error(f"🛑 **HIGH RISK PROMPT** - Score: {score}/10")
                             st.markdown("**Action:** Preventive Block (Session interruption and payload isolation)")
 
                         elif score >= 4.0:
                             # MEDIUM Level (4.0 - 6.9) -> Yellow (st.warning)
-                            st.warning(f"⚠️ **MEDIUM RISK** - Score: {score}/10")
+                            st.warning(f"⚠️ **MEDIUM RISK PROMPT** - Score: {score}/10")
                             st.markdown(
                                 "**Action:** Log & Guardrail (Analysis recorded, activation of preventive semantic filters)")
 
                         else:
                             # LOW Level (0.0 - 3.9) -> Green (st.success)
-                            st.success(f"✅ **SECURE (LOW RISK)** - Score: {score}/10")
+                            st.success(f"✅ **SECURE PROMPT(LOW RISK)** - Score: {score}/10")
                             st.markdown("**Action:** Allow (Payload is processed without restrictions)")
 
                         col1, col2, col3 = st.columns(3)

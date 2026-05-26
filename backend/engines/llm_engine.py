@@ -49,18 +49,15 @@ def evaluate_with_llm(payload: PayloadRequest, combined_text: str, static_penalt
                       "reasoning": "<Step-by-step analysis of true intent, context, and wrappers>",
                       "risk_score": <float 0.0-10.0>,
                       "risk_level": "<BENIGN|LOW|MEDIUM|HIGH|CRITICAL>",
-                      "detected_intent": "<True intent>",
-                      "impact": "<Potential damage>",
+                      "detected_intent": "<True intent of the prompt>",
+                      "impact": "<Potential damage and repercussions>",
                       "atlas_technique_id": "<Exact ID or 'N/A'>",
-                      "mitigation_action": "<Action or 'None'>"
+                      "mitigation_action": "<Action in detail or 'None'>"
                     }}"""
 
     # NOTA DEVSECOPS: Queste chiavi andranno poi spostate nel file .env!
     GROQ_API_KEYS = [
-        "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",
-        "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",
-        "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",
-        "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"
+        "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"
     ]
 
     response = None
@@ -111,5 +108,5 @@ def evaluate_with_llm(payload: PayloadRequest, combined_text: str, static_penalt
         impact=llm_eval.get("impact", "Unknown"),
         atlas_technique_id=tech_id,
         mitigation_action=mitigation,
-        analysis_layer=f"Hybrid AI Aggregation (Base: {base_score} | Indirect: +{indirect_injection_penality} | WAF: +{static_penalty})"
+        analysis_layer=f"Hybrid AI Aggregation (Base Score: {base_score} | Indirect Prompt Penality: +{indirect_injection_penality} | Static Signature: +{static_penalty})"
     )
