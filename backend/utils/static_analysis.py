@@ -42,13 +42,26 @@ THREAT_SIGNATURES = [
         ]
     },
     {
+        "intent": "System State & Meta-Prompt Extraction",
+        "id": "AML.T0054", # LLM Meta-Prompt Extraction (MITRE ATLAS)
+        "risk_score": 10.0,
+        "risk_level": "CRITICAL",
+        "impact": "Host Compromise / Intellectual Property Leakage via formatting wrappers or meta-commands.",
+        "patterns": [
+            # Intercetta i bare meta-commands tipici della ricognizione (Reconnaissance) anche se a capo
+            re.compile(r"(?im)^\s*/(env|sysinfo|tools|config)\b"),
+            # Intercetta le keyword letali usate per estrarre le istruzioni base tramite Formatting Wrappers
+            re.compile(r"(?i)\b(system_prompt|env_vars|internal\s+instructions)\b")
+        ]
+    },
+    {
         "intent": "Heavy Obfuscated Payload / Evasion",
         "id": "AML.T0043",
         "risk_score": 7.5,
         "risk_level": "HIGH",
         "impact": "Attempt to bypass semantic filters using heavy encoding. Requires active investigation.",
         "patterns": [
-            # Modificato per catturare solo stringhe Base64 molto lunghe (evita falsi positivi su piccoli ID o JWT innocui)
+            # Cattura solo stringhe Base64 molto lunghe (evita falsi positivi su piccoli ID o JWT innocui)
             re.compile(r"\b(?:[A-Za-z0-9+/]{4}){15,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\b"),
             # Almeno 8 byte esadecimali consecutivi
             re.compile(r"(\\x[0-9a-fA-F]{2}){8,}")
