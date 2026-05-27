@@ -1,254 +1,953 @@
-/* =========================================
-   JANUS GATEWAY - ENTERPRISE STYLESHEET
-   ========================================= */
+/* =====================================================
+   JANUS GATEWAY — STYLE.CSS  v7.0
+   SOC Enterprise · Light Theme · Generous Spacing
+   ===================================================== */
 
-/* --- 1. LAYOUT & SPAZIATURA GENERALE --- */
-/* Riduce i margini superiori e allarga il contenitore per un vero effetto Dashboard */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ─── 0. DESIGN TOKENS ─────────────────────────────── */
+:root {
+    --blue-900:#0f2244; --blue-800:#1a3a6e; --blue-700:#1d4ed8;
+    --blue-600:#2563eb; --blue-500:#3b82f6; --blue-400:#60a5fa;
+    --blue-200:#bfdbfe; --blue-100:#dbeafe; --blue-50:#eff6ff;
+
+    --slate-900:#0f172a; --slate-800:#1e293b; --slate-700:#334155;
+    --slate-600:#475569; --slate-500:#64748b; --slate-400:#94a3b8;
+    --slate-300:#cbd5e1; --slate-200:#e2e8f0; --slate-100:#f1f5f9;
+    --slate-50:#f8fafc;  --white:#ffffff;
+
+    --red-700:#b91c1c; --red-500:#ef4444;
+    --red-200:#fecaca; --red-100:#fee2e2; --red-50:#fef2f2;
+    --amber-700:#b45309; --amber-100:#fef3c7; --amber-50:#fffbeb;
+    --green-700:#15803d; --green-600:#16a34a;
+    --green-100:#dcfce7; --green-50:#f0fdf4;
+
+    --r: 10px;
+    --s0: 0 1px 3px rgba(15,34,68,.06), 0 1px 2px rgba(15,34,68,.04);
+    --s1: 0 4px 12px rgba(15,34,68,.08), 0 2px 4px rgba(15,34,68,.04);
+    --s2: 0 8px 24px rgba(15,34,68,.10), 0 4px 8px rgba(15,34,68,.06);
+}
+
+/* ─── 1. BASE ───────────────────────────────────────── */
+html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
+
+.stApp {
+    background-color : #eef2f7 !important;
+    background-image : radial-gradient(circle, rgba(148,163,184,.35) 1px, transparent 1px) !important;
+    background-size  : 24px 24px !important;
+}
+
+header[data-testid="stHeader"],
+footer,
+.stDeployButton { display: none !important; }
+
 .block-container {
-    padding-top: 2rem !important;
-    padding-bottom: 2rem !important;
-    max-width: 98% !important;
+    padding-top    : 1.4rem !important;
+    padding-bottom : 2.4rem !important;
+    max-width      : 98% !important;
 }
 
-/* Rimuove lo spazio vuoto in alto tipico di Streamlit */
-header[data-testid="stHeader"] {
-    display: none;
+/* Scrollbars — light & always visible */
+::-webkit-scrollbar          { width: 10px; height: 10px; }
+::-webkit-scrollbar-track    { background: var(--slate-50); border-radius: 10px; border: 1px solid var(--slate-100); }
+::-webkit-scrollbar-thumb    { background: var(--slate-300); border-radius: 10px; border: 2px solid var(--slate-50); }
+::-webkit-scrollbar-thumb:hover { background: var(--blue-400); }
+
+/* ─── 2. CONTAINER RESET ────────────────────────────── */
+div[data-testid="stVerticalBlock"],
+div[data-testid="stVerticalBlockBorderWrapper"],
+div[data-testid="stHorizontalBlock"],
+div[data-testid="column"] {
+    background : transparent !important;
+    border     : none !important;
+    box-shadow : none !important;
+    padding    : 0 !important;
+    gap        : 0 !important;
 }
 
-/* --- 2. HEADER E TITOLI --- */
+/* ─── 3. HEADER — light & prominent ──────────────────── */
 .header-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start; /* Allineato a sinistra come nella reference */
-    gap: 20px;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e2e8f0;
+    display       : flex;
+    align-items   : center;
+    gap           : 20px;
+    padding       : 0 28px;
+    height        : 90px;
+    background    : var(--white);
+    border        : 1px solid var(--slate-200);
+    border-radius : var(--r);
+    box-shadow    : var(--s1);
+    margin-bottom : 1.8rem;
 }
-.header-title-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
+
+.header-logo          { width: 60px; height: 60px; object-fit: contain; flex-shrink: 0; }
+.header-logo-fallback { font-size: 2.4rem; flex-shrink: 0; }
+
+.header-title-container { display: flex; flex-direction: column; justify-content: center; flex: 1; }
 .header-title-container h1 {
-    margin: 0;
-    padding: 0;
-    color: #0f172a;
-    font-size: 2.4rem;
-    font-weight: 800;
-    letter-spacing: -0.8px;
+    margin       : 0 !important; padding: 0 !important;
+    font-size    : 1.7rem !important; font-weight: 700 !important;
+    letter-spacing: -.5px !important; color: var(--slate-900) !important;
+    line-height  : 1.1 !important;
 }
 .header-title-container p {
-    color: #64748b;
-    font-size: 1.05rem;
-    margin: 4px 0 0 0;
-    font-weight: 500;
+    margin      : 6px 0 0 !important;
+    font-family : 'IBM Plex Mono', monospace !important;
+    font-size   : .82rem !important; font-weight: 400 !important;
+    color       : var(--slate-500) !important;
+    letter-spacing: .1px !important;
 }
 
-/* --- 3. MENU LATERALE (RADIO BUTTONS AS MENU) --- */
-/* Search box compatto */
-.stTextInput {
-    margin-bottom: 5px;
-}
-
-div[role="radiogroup"] {
-    gap: 4px !important;
-}
-/* Nascondi il pallino radio nativo */
-div[role="radiogroup"] label > div:first-child {
-    display: none !important;
-}
-/* Stile del pulsante menu */
-div[role="radiogroup"] > label {
-    padding: 10px 16px !important;
-    border-radius: 8px;
-    background-color: transparent;
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
-    border: 1px solid transparent;
-}
-/* Effetto Hover e Attivo */
-div[role="radiogroup"] > label:hover {
-    background-color: #f8fafc;
-    border-color: #e2e8f0;
-}
-div[role="radiogroup"] > label[data-checked="true"] {
-    background-color: #eff6ff !important;
-    border-color: #bfdbfe !important;
-    border-left: 4px solid #2563eb !important; /* Riga blu a sinistra per la selezione */
-}
-/* Testo del menu */
-div[role="radiogroup"] div[data-testid="stMarkdownContainer"] p {
-    font-size: 0.95rem;
-    color: #334155;
-    font-weight: 600;
-    margin: 0;
-}
-
-/* --- 4. MODERN TABS STYLING --- */
-
-/* Main Tabs: Allineamento Centrato */
-div[role="tablist"] {
-    display: flex !important;
-    justify-content: center !important; /* <-- Questa è la riga magica per centrare */
-    width: 100% !important;
-    gap: 40px !important;
-    border-bottom: 1px solid #cbd5e1;
-    margin-bottom: 1.5rem !important;
-}
-
-button[role="tab"] {
-    height: 48px;
-    background-color: transparent !important;
-    border: none !important;
-    border-bottom: 3px solid transparent !important;
-    border-radius: 0 !important;
-    font-weight: 600 !important;
-    font-size: 1.1rem !important;
-    color: #64748b !important;
-    transition: color 0.2s, border-color 0.2s;
-    padding: 0 15px !important;
-}
-
-button[role="tab"]:hover {
-    color: #0f172a !important;
-}
-
-button[role="tab"][aria-selected="true"] {
-    color: #2563eb !important;
-    border-bottom-color: #2563eb !important;
-}
-
-/* Sub-tabs (MITRE e OWASP): Riportate a sinistra per ordine visivo */
-div[data-testid="stTabs"] div[data-testid="stTabs"] div[role="tablist"] {
-    justify-content: flex-start !important; /* <-- Le sottosezioni restano a sinistra */
-    gap: 15px !important;
-    margin-top: 0 !important;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-div[data-testid="stTabs"] div[data-testid="stTabs"] button[role="tab"] {
-    height: 38px !important;
-    font-size: 0.95rem !important;
-}
-
-/* --- 5. CARDS & METRICS --- */
-/* Stile per i box delle metriche */
-[data-testid="stMetric"] {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); /* Ombra enterprise */
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-[data-testid="stMetric"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-}
-[data-testid="stMetricLabel"] {
-    color: #64748b !important;
-    font-size: 0.9rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-[data-testid="stMetricValue"] {
-    font-size: 1.8rem !important;
-    font-weight: 700 !important;
-    color: #0f172a;
-    margin-top: 8px;
-}
-
-/* --- 6. BADGES, BOX & UI ELEMENTS --- */
-/* Badge/Pillole */
-.tactic-badge {
-    display: inline-flex;
-    align-items: center;
-    background-color: #f1f5f9;
-    color: #475569;
-    border: 1px solid #cbd5e1;
-    padding: 6px 14px;
-    border-radius: 6px; /* Bordo meno arrotondato, più tech */
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    margin: 4px 8px 16px 0;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-}
-
-/* Box Descrizione Info */
-.description-box {
-    background-color: #f8fafc;
-    border-left: 4px solid #2563eb; /* Blu primario */
-    padding: 18px 24px;
-    border-radius: 0 8px 8px 0;
-    margin: 1rem 0;
-    color: #334155;
-    font-size: 1.05rem;
-    line-height: 1.7;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-}
-
-/* --- 7. CUSTOM EXPANDER (CASE STUDIES) --- */
-/* Container dell'expander */
-div[data-testid="stExpander"] {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-    margin-bottom: 1rem;
-    overflow: hidden;
-}
-
-/* Intestazione dell'expander (Summary) */
-div[data-testid="stExpander"] details summary {
-    padding: 15px 20px !important;
-    background-color: #f8fafc;
-    transition: background-color 0.2s;
-}
-div[data-testid="stExpander"] details summary:hover {
-    background-color: #f1f5f9;
-}
-
-/* Testo del titolo dell'expander */
-div[data-testid="stExpander"] details summary p {
-    font-size: 1.15rem !important;
-    font-weight: 700 !important;
-    color: #1e293b !important;
-    letter-spacing: -0.3px;
-    margin: 0 !important;
-}
-
-/* Contenuto interno dell'expander */
-div[data-testid="stExpander"] details div[data-testid="stExpanderDetails"] {
-    padding: 20px !important;
-    border-top: 1px solid #e2e8f0;
-}
-
-/* --- 8. GITHUB LINK POSITIONING --- */
-.github-wrapper {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-}
-.github-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    color: #64748b;
-    font-weight: 600;
-    font-size: 0.95rem;
-    background-color: #f8fafc;
-    padding: 8px 16px;
+/* status pill — light green */
+.status-pill {
+    display      : flex;
+    align-items  : center;
+    gap          : 7px;
+    font-family  : 'IBM Plex Mono', monospace;
+    font-size    : .76rem;
+    color        : var(--green-700);
+    background   : var(--green-100);
+    border       : 1px solid #bbf7d0;
+    padding      : 6px 14px;
     border-radius: 20px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
+    white-space  : nowrap;
+    flex-shrink  : 0;
 }
-.github-link:hover {
-    color: #0f172a;
-    background-color: #f1f5f9;
-    border-color: #cbd5e1;
-    transform: translateY(-1px);
+.status-dot {
+    width        : 7px;
+    height       : 7px;
+    border-radius: 50%;
+    background   : var(--green-600);
+    flex-shrink  : 0;
+    animation    : blink 2.5s ease-in-out infinite;
 }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* github button — blue tint */
+.github-link {
+    display         : inline-flex;
+    align-items     : center;
+    gap             : 7px;
+    text-decoration : none !important;
+    color           : var(--blue-700) !important;
+    font-size       : .85rem;
+    font-weight     : 500;
+    background      : var(--blue-50);
+    padding         : 7px 16px;
+    border-radius   : 20px;
+    border          : 1px solid var(--blue-200);
+    transition      : all .15s;
+    white-space     : nowrap;
+    flex-shrink     : 0;
+}
+.github-link:hover { background: var(--blue-100); border-color: var(--blue-400); transform: translateY(-1px); }
+.github-wrapper    { display: none !important; }
+
+/* ─── 4. MAIN TABS — INLINE NAVBAR (transform lift) ───
+   Lift tablist into header zone (transform keeps it in flow);
+   collapse the original space with negative margin so the
+   tabpanels rise back. Tabs are horizontally centered in the
+   navbar via justify-content. */
+div[data-testid="stTab"] > div > div:first-child {
+    transform     : translateY(-103px) !important;
+    margin        : 0 0 -50px 0 !important;
+    background    : transparent !important;
+    padding       : 0 !important;
+    position      : relative;
+    z-index       : 50;
+    pointer-events: none;
+}
+div[data-testid="stTab"] > div > div:first-child > div,
+div[data-testid="stTab"] > div > div:first-child button[role="tab"] { pointer-events: auto; }
+
+/* Hide BOTH Streamlit-injected indicators (outer divider + inner sliding bar) */
+div[data-testid="stTab"] > div > div[role="presentation"],
+div[role="tablist"] > div[role="presentation"] { display: none !important; }
+
+div[role="tablist"] {
+    display         : flex !important;
+    justify-content : center !important;
+    align-items     : center !important;
+    gap             : 16px !important;
+    border-bottom   : none !important;
+    margin          : 0 !important;
+    padding         : 0 !important;
+    background      : transparent !important;
+    height          : 90px !important;
+}
+button[role="tab"] {
+    height        : 90px !important;
+    display       : inline-flex !important;
+    align-items   : center !important;
+    background    : transparent !important;
+    border        : none !important;
+    border-radius : 0 !important;
+    font-family   : 'Inter', sans-serif !important;
+    font-weight   : 500 !important;
+    font-size     : .92rem !important;
+    color         : var(--slate-500) !important;
+    padding       : 0 18px !important;
+    margin        : 0 !important;
+    transition    : color .15s !important;
+    box-shadow    : none !important;
+}
+button[role="tab"]:hover { color: var(--slate-800) !important; }
+button[role="tab"][aria-selected="true"] {
+    color       : var(--blue-700) !important;
+    font-weight : 600 !important;
+}
+
+/* Main tab SVG icons (FontAwesome-style monochrome, mask-image) */
+button[role="tab"]::before {
+    content              : '';
+    display              : inline-block;
+    width                : 16px;
+    height               : 16px;
+    margin-right         : 8px;
+    vertical-align       : -3px;
+    background-color     : currentColor;
+    -webkit-mask-repeat  : no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size    : contain;
+    mask-repeat          : no-repeat;
+    mask-position        : center;
+    mask-size            : contain;
+}
+/* Tab 1: Knowledge Bases — book/library icon */
+button[role="tab"]:nth-of-type(1)::before {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 3.5A1.5 1.5 0 0 1 5.5 2H19a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6.5a1.5 1.5 0 0 0 0 3H20v1H5.5A2.5 2.5 0 0 1 3 20.5v-17a.5.5 0 0 1 1 0zM6 17h12V4H6v13z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 3.5A1.5 1.5 0 0 1 5.5 2H19a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6.5a1.5 1.5 0 0 0 0 3H20v1H5.5A2.5 2.5 0 0 1 3 20.5v-17a.5.5 0 0 1 1 0zM6 17h12V4H6v13z'/%3E%3C/svg%3E");
+}
+/* Tab 2: Risk Engine — radar/target icon */
+button[role="tab"]:nth-of-type(2)::before {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-14a6 6 0 1 0 6 6 6 6 0 0 0-6-6zm0 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4zm0-6a2 2 0 1 0 2 2 2 2 0 0 0-2-2z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-14a6 6 0 1 0 6 6 6 6 0 0 0-6-6zm0 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4zm0-6a2 2 0 1 0 2 2 2 2 0 0 0-2-2z'/%3E%3C/svg%3E");
+}
+
+/* sub-tabs */
+div[data-testid="stTabs"] div[data-testid="stTabs"] div[role="tablist"] {
+    border-bottom: 1px solid var(--slate-200) !important;
+    margin-bottom: 1.4rem !important;
+}
+div[data-testid="stTabs"] div[data-testid="stTabs"] button[role="tab"] {
+    height: 38px !important; font-size: .85rem !important; padding: 0 18px !important;
+}
+
+/* ─── 5. KB TWO-COLUMN LAYOUT — card-on-each-column
+   The horizontal block is a transparent layout container
+   (no overflow:hidden) so position:sticky works on the
+   sidebar. Each column gets its own border + radius. */
+div[data-testid="stHorizontalBlock"]:has(div[role="radiogroup"]) {
+    background    : transparent !important;
+    border        : none !important;
+    border-radius : 0 !important;
+    box-shadow    : none !important;
+    overflow      : visible !important;
+    align-items   : flex-start !important;
+}
+
+/* LEFT column — sticky sidebar, viewport-capped, scrolls internally */
+div[data-testid="column"]:has(div[role="radiogroup"]) {
+    background     : var(--white) !important;
+    padding        : 16px 0 !important;
+    border         : 1px solid var(--slate-200) !important;
+    border-radius  : var(--r) 0 0 var(--r) !important;
+    box-shadow     : var(--s1) !important;
+    display        : flex !important;
+    flex-direction : column !important;
+    position       : sticky !important;
+    top            : 14px !important;
+    max-height     : calc(100vh - 32px) !important;
+    min-height     : 0 !important;
+    overflow       : hidden !important;
+}
+
+/* RIGHT column — generous white surface, joined to sidebar via shared edge */
+div[data-testid="column"]:has(div[role="radiogroup"]) + div[data-testid="column"] {
+    background    : var(--white) !important;
+    padding       : 28px 32px !important;
+    border        : 1px solid var(--slate-200) !important;
+    border-left   : none !important;
+    border-radius : 0 var(--r) var(--r) 0 !important;
+    box-shadow    : var(--s1) !important;
+    min-height    : calc(100vh - 32px) !important;
+}
+
+/* ─── 6. SEARCH INPUT (sidebar) ─────────────────────── */
+div[data-testid="column"]:has(div[role="radiogroup"]) div[data-testid="stTextInput"] {
+    padding: 0 14px 10px !important;
+}
+
+div[data-testid="stTextInput"] label { display: none !important; }
+
+div[data-testid="stTextInput"] input {
+    font-family   : 'IBM Plex Mono', monospace !important;
+    font-size     : .8rem !important;
+    background    : var(--slate-50) !important;
+    border        : 1px solid var(--slate-200) !important;
+    border-radius : 7px !important;
+    color         : var(--slate-800) !important;
+    padding       : 9px 12px !important;
+    transition    : border-color .15s, background .15s, box-shadow .15s;
+}
+div[data-testid="stTextInput"] input:focus {
+    background   : var(--white) !important;
+    border-color : var(--blue-400) !important;
+    box-shadow   : 0 0 0 3px rgba(59,130,246,.12) !important;
+    outline      : none !important;
+}
+div[data-testid="stTextInput"] input::placeholder { color: var(--slate-400) !important; }
+
+/* ─── 7. RADIO LIST — fills column, internal scroll ──
+   With the column being flex+overflow:hidden+min-height:0,
+   we make the inner vertical block flex:1 so the scrollable
+   container stretches to fill, then auto-scrolls overflow. */
+div[data-testid="column"]:has(div[role="radiogroup"]) > div[data-testid="stVerticalBlock"] {
+    flex           : 1 1 auto !important;
+    min-height     : 0 !important;
+    display        : flex !important;
+    flex-direction : column !important;
+}
+div[data-testid="column"]:has(div[role="radiogroup"]) > div[data-testid="stVerticalBlock"] > div[data-testid="stElementContainer"]:has(div[data-testid="stTextInput"]),
+div[data-testid="column"]:has(div[role="radiogroup"]) > div[data-testid="stVerticalBlock"] > div[data-testid="stElementContainer"]:has(div[role="radiogroup"]:not([aria-label="KB type"])) {
+    flex: 0 0 auto !important;
+}
+
+div[data-testid="column"]:has(div[role="radiogroup"])
+div[data-testid="stVerticalBlockBorderWrapper"]:has(div[role="radiogroup"]) {
+    background    : var(--white) !important;
+    border        : none !important;
+    border-top    : 1px solid var(--slate-100) !important;
+    box-shadow    : none !important;
+    margin-top    : 0 !important;
+    flex          : 1 1 auto !important;
+    min-height    : 0 !important;
+    height        : auto !important;
+    max-height    : none !important;
+    overflow-y    : auto !important;
+}
+
+/* Tech / OWASP list radio (excludes the KB type pill toggle) */
+div[role="radiogroup"]:not([aria-label="KB type"])                         { gap: 1px !important; }
+div[role="radiogroup"]:not([aria-label="KB type"]) label > div:first-child { display: none !important; }
+div[role="radiogroup"]:not([aria-label="KB type"]) > label {
+    padding       : 9px 16px !important;
+    border-radius : 0 !important;
+    background    : transparent !important;
+    border        : none !important;
+    border-left   : 2px solid transparent !important;
+    transition    : background .1s, border-color .1s !important;
+    cursor        : pointer !important;
+}
+div[role="radiogroup"]:not([aria-label="KB type"]) > label:hover { background: var(--slate-50) !important; }
+div[role="radiogroup"]:not([aria-label="KB type"]) > label:has(input:checked) {
+    background        : var(--blue-50) !important;
+    border-left-color : var(--blue-600) !important;
+}
+div[role="radiogroup"]:not([aria-label="KB type"]) div[data-testid="stMarkdownContainer"] p {
+    font-family : 'IBM Plex Mono', monospace !important;
+    font-size   : .76rem !important;
+    color       : var(--slate-600) !important;
+    font-weight : 400 !important;
+    margin      : 0 !important;
+    white-space : nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+div[role="radiogroup"]:not([aria-label="KB type"]) > label:has(input:checked) div[data-testid="stMarkdownContainer"] p {
+    color: var(--blue-800) !important; font-weight: 500 !important;
+}
+
+/* ─── 8. TYPOGRAPHY HELPERS ─────────────────────────── */
+/* .tech-detail-title overrides h3 globally — needs !important */
+h3.tech-detail-title,
+.tech-detail-title {
+    font-size      : 1.75rem !important;
+    font-weight    : 700 !important;
+    color          : var(--slate-900) !important;
+    letter-spacing : -.6px !important;
+    margin         : 0 0 26px !important;
+    padding        : 0 !important;
+    line-height    : 1.2 !important;
+    font-family    : 'Inter', sans-serif !important;
+}
+.page-title {
+    font-size      : 1.5rem !important;
+    font-weight    : 700 !important;
+    color          : var(--slate-900) !important;
+    letter-spacing : -.4px !important;
+    line-height    : 1.2 !important;
+}
+/* Section labels: bigger, bolder, uniform across Description /
+   Suggested Mitigations / Real-World Case Studies.  */
+.section-label {
+    display        : block;
+    font-family    : 'IBM Plex Mono', monospace;
+    font-size      : .95rem;
+    font-weight    : 700;
+    text-transform : uppercase;
+    letter-spacing : 1.1px;
+    color          : var(--slate-700);
+    padding-bottom : 10px;
+    border-bottom  : 1px solid var(--slate-200);
+    margin         : 1.8rem 0 1rem;
+}
+.section-label.defense { color: var(--blue-600); }
+
+/* Plain description text — replaces the boxed h4+p pattern so
+   the Description heading is just a section-label like the others. */
+.description-text {
+    font-size      : .95rem;
+    color          : var(--slate-700);
+    line-height    : 1.85;
+    margin         : 0 0 1.2rem;
+}
+
+/* ─── 9. META BLOCK ─────────────────────────────────── */
+.meta-block {
+    margin-bottom : 1.6rem;
+    border-radius : var(--r);
+    overflow      : hidden;
+    border        : 1px solid var(--slate-200);
+}
+.meta-strip {
+    display               : grid;
+    grid-template-columns : repeat(4,1fr);
+    background            : var(--slate-50);
+}
+.meta-strip.cols-3 { grid-template-columns: repeat(3,1fr); }
+
+.meta-cell            { padding: 16px 18px; border-right: 1px solid var(--slate-200); }
+.meta-cell:last-child { border-right: none; }
+.meta-label {
+    font-family   : 'IBM Plex Mono', monospace;
+    font-size     : .68rem;
+    font-weight   : 700;
+    text-transform: uppercase;
+    letter-spacing: .9px;
+    color         : var(--slate-900);
+    margin-bottom : 8px;
+}
+.meta-value { font-size: 1.4rem; font-weight: 400; color: var(--slate-700); line-height: 1.1; }
+
+.info-strip {
+    display               : grid;
+    grid-template-columns : repeat(3,1fr);
+    background            : var(--white);
+    border-top            : 1px solid var(--slate-200);
+}
+.info-cell            { display: flex; align-items: center; gap: 11px; padding: 12px 18px; border-right: 1px solid var(--slate-200); }
+.info-cell:last-child { border-right: none; }
+.info-cell-icon       { font-size: .95rem; flex-shrink: 0; }
+.info-cell-lbl {
+    font-family   : 'IBM Plex Mono', monospace;
+    font-size     : .6rem;
+    font-weight   : 600;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color         : var(--slate-400);
+    margin-bottom : 3px;
+}
+.info-cell-val { font-size: .83rem; font-weight: 500; color: var(--slate-700); }
+
+/* ─── 10. DESCRIPTION BOX ───────────────────────────── */
+.description-box {
+    background    : var(--white);
+    border        : 1px solid var(--slate-200);
+    border-left   : 3px solid var(--blue-500);
+    border-radius : 0 var(--r) var(--r) 0;
+    padding       : 18px 22px;
+    margin        : .2rem 0 .4rem;
+}
+.description-box h4 {
+    font-family   : 'IBM Plex Mono', monospace;
+    font-size     : .63rem;
+    text-transform: uppercase;
+    letter-spacing: .95px;
+    color         : var(--blue-600);
+    margin        : 0 0 12px;
+    font-weight   : 600;
+}
+.description-box p { font-size: .92rem; color: var(--slate-700); line-height: 1.8; margin: 0; }
+
+/* ─── 11. MITIGATIONS LIST (clean cards, no accent) ── */
+.mit-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 1rem; }
+.mit-row {
+    display       : flex;
+    align-items   : flex-start;
+    gap           : 12px;
+    padding       : 14px 18px;
+    background    : var(--white);
+    border        : 1px solid var(--slate-200);
+    border-radius : var(--r);
+    font-size     : .9rem;
+    color         : var(--slate-700);
+    line-height   : 1.7;
+}
+.mit-row-icon { color: var(--blue-600); flex-shrink: 0; margin-top: 2px; line-height: 1; }
+.mit-row-icon svg { display: block; width: 16px; height: 16px; }
+.mit-row strong { font-weight: 600; color: var(--slate-900); }
+
+/* ─── 11b. CALLOUT BOXES (impact / scenario / etc.) ──
+   Unified description-box family with color variants. */
+.callout-box {
+    background    : var(--white);
+    border        : 1px solid var(--slate-200);
+    border-radius : 0 var(--r) var(--r) 0;
+    padding       : 16px 20px;
+    margin        : .5rem 0;
+}
+.callout-box h4 {
+    font-family   : 'IBM Plex Mono', monospace;
+    font-size     : .63rem;
+    text-transform: uppercase;
+    letter-spacing: .95px;
+    margin        : 0 0 10px;
+    font-weight   : 600;
+}
+.callout-box p { font-size: .9rem; color: var(--slate-700); line-height: 1.75; margin: 0; }
+.callout-box.blue  { border-left: 3px solid var(--blue-500); }
+.callout-box.blue  h4 { color: var(--blue-600); }
+.callout-box.red   { border-left: 3px solid var(--red-500); }
+.callout-box.red   h4 { color: var(--red-700); }
+.callout-box.amber { border-left: 3px solid var(--amber-700); }
+.callout-box.amber h4 { color: var(--amber-700); }
+
+/* ─── 12. ENGINE BANNER ─────────────────────────────── */
+.engine-banner {
+    display         : flex;
+    align-items     : center;
+    justify-content : space-between;
+    gap             : 14px;
+    padding         : 18px 22px;
+    background      : var(--white);
+    border          : 1px solid var(--slate-200);
+    border-left     : 4px solid var(--blue-600);
+    border-radius   : 0 var(--r) var(--r) 0;
+    margin-bottom   : 1.4rem;
+    box-shadow      : var(--s0);
+}
+.engine-banner-left   { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+.engine-banner-title  { font-size: 1.1rem; font-weight: 700; color: var(--slate-900); letter-spacing: -.2px; }
+.engine-banner-sub    { font-family: 'IBM Plex Mono', monospace; font-size: .73rem; color: var(--slate-500); }
+.engine-banner-badges { display: flex; gap: 6px; flex-shrink: 0; }
+.ebadge {
+    font-family   : 'IBM Plex Mono', monospace;
+    font-size     : .68rem;
+    font-weight   : 700;
+    padding       : 4px 10px;
+    border-radius : 4px;
+    border        : 1px solid;
+    white-space   : nowrap;
+    letter-spacing: .5px;
+}
+.ebadge-waf { background: var(--amber-50); color: var(--amber-700); border-color: var(--amber-100); }
+.ebadge-llm { background: var(--blue-50);  color: var(--blue-700);  border-color: var(--blue-200); }
+
+/* Uniform mono section labels for engine inputs — tight */
+.engine-section-label {
+    display        : block;
+    font-family    : 'IBM Plex Mono', monospace;
+    font-size      : .68rem;
+    font-weight    : 600;
+    text-transform : uppercase;
+    letter-spacing : 1px;
+    color          : var(--slate-500);
+    margin         : .8rem 0 6px;
+    padding        : 0;
+    line-height    : 1.2;
+}
+.engine-run-spacer { height: 10px; }
+
+/* ─── KB-TYPE PILL TOGGLE (sub-tabs inside sidebar) ─── */
+div[role="radiogroup"][aria-label="KB type"] {
+    display       : flex !important;
+    gap           : 3px !important;
+    background    : var(--slate-100);
+    border-radius : 8px;
+    padding       : 3px;
+    margin        : 0 12px 10px !important;
+}
+div[role="radiogroup"][aria-label="KB type"] > label {
+    flex            : 1 1 0 !important;
+    padding         : 6px 8px !important;
+    border-radius   : 6px !important;
+    border          : none !important;
+    background      : transparent !important;
+    cursor          : pointer !important;
+    transition      : background .12s, color .12s !important;
+    display         : flex !important;
+    align-items     : center !important;
+    justify-content : center !important;
+    text-align      : center !important;
+    gap             : 0 !important;
+}
+div[role="radiogroup"][aria-label="KB type"] > label > div:first-child { display: none !important; }
+div[role="radiogroup"][aria-label="KB type"] > label > div[data-testid="stMarkdownContainer"] {
+    flex       : 0 1 auto !important;
+    text-align : center !important;
+}
+div[role="radiogroup"][aria-label="KB type"] > label:hover { background: var(--white) !important; }
+div[role="radiogroup"][aria-label="KB type"] > label:has(input:checked) {
+    background : var(--white) !important;
+    box-shadow : 0 1px 2px rgba(15,34,68,.08) !important;
+}
+div[role="radiogroup"][aria-label="KB type"] div[data-testid="stMarkdownContainer"] p {
+    font-family : 'Inter', sans-serif !important;
+    font-size   : .8rem !important;
+    font-weight : 600 !important;
+    color       : var(--slate-500) !important;
+    margin      : 0 !important;
+    white-space : nowrap; overflow: visible; text-overflow: clip;
+    text-align  : center !important;
+}
+div[role="radiogroup"][aria-label="KB type"] > label:has(input:checked) div[data-testid="stMarkdownContainer"] p {
+    color: var(--blue-700) !important;
+}
+
+/* ─── 13. TEXTAREA ──────────────────────────────────── */
+/* Native label styled as section label (mono uppercase, breathing room) */
+div[data-testid="stTextArea"] label,
+div[data-testid="stTextArea"] label p {
+    font-family    : 'IBM Plex Mono', monospace !important;
+    font-size      : .7rem !important;
+    font-weight    : 600 !important;
+    color          : var(--slate-500) !important;
+    text-transform : uppercase !important;
+    letter-spacing : 1px !important;
+    margin-bottom  : 10px !important;
+    padding-bottom : 0 !important;
+    line-height    : 1.2 !important;
+}
+div[data-testid="stTextArea"] textarea {
+    font-family  : 'IBM Plex Mono', monospace !important;
+    font-size    : .85rem !important;
+    background   : var(--white) !important;
+    border       : 1px solid var(--slate-200) !important;
+    border-radius: var(--r) !important;
+    color        : var(--slate-800) !important;
+    line-height  : 1.7 !important;
+    resize       : vertical !important;
+    transition   : border-color .15s, box-shadow .15s;
+    padding      : 14px 16px !important;
+}
+div[data-testid="stTextArea"] textarea:focus {
+    border-color : var(--blue-400) !important;
+    box-shadow   : 0 0 0 3px rgba(59,130,246,.12) !important;
+    outline      : none !important;
+}
+div[data-testid="stTextArea"] textarea::placeholder { color: var(--slate-400) !important; font-style: italic; }
+
+/* ─── 14. FILE UPLOADER (compact, single-line) ────── */
+div[data-testid="stFileUploader"] {
+    border        : 1px dashed var(--slate-300) !important;
+    border-radius : var(--r) !important;
+    background    : var(--white) !important;
+    transition    : border-color .15s, background .15s;
+    padding       : 0 !important;
+}
+div[data-testid="stFileUploader"]:hover {
+    border-color : var(--blue-400) !important;
+    background   : var(--blue-50) !important;
+}
+div[data-testid="stFileUploader"] section {
+    padding     : 8px 14px !important;
+    min-height  : 0 !important;
+    display     : flex !important;
+    align-items : center !important;
+    gap         : 10px !important;
+}
+div[data-testid="stFileUploader"] section > div:first-child {
+    flex: 1 !important;
+}
+div[data-testid="stFileUploader"] section small,
+div[data-testid="stFileUploader"] section [data-testid="stFileUploaderDropzoneInstructions"] small { display: none !important; }
+div[data-testid="stFileUploader"] section [data-testid="stFileUploaderDropzoneInstructions"] {
+    padding: 0 !important;
+}
+div[data-testid="stFileUploader"] section [data-testid="stFileUploaderDropzoneInstructions"] > div > span {
+    font-size: .85rem !important;
+    color: var(--slate-600) !important;
+}
+div[data-testid="stFileUploader"] section button {
+    padding: 4px 12px !important;
+    font-size: .8rem !important;
+    height: 32px !important;
+}
+
+/* ─── 15. BUTTON ────────────────────────────────────── */
+div[data-testid="stButton"] > button {
+    font-family   : 'Inter', sans-serif !important;
+    font-weight   : 600 !important;
+    font-size     : .9rem !important;
+    border-radius : var(--r) !important;
+    border        : none !important;
+    background    : var(--blue-700) !important;
+    color         : #fff !important;
+    letter-spacing: .2px !important;
+    padding       : 10px 20px !important;
+    box-shadow    : 0 2px 8px rgba(29,78,216,.28) !important;
+    transition    : all .15s ease !important;
+}
+div[data-testid="stButton"] > button:hover {
+    background : var(--blue-900) !important;
+    box-shadow : 0 4px 16px rgba(29,78,216,.38) !important;
+    transform  : translateY(-1px) !important;
+}
+div[data-testid="stButton"] > button:active {
+    transform  : translateY(0) !important;
+    box-shadow : 0 1px 4px rgba(29,78,216,.2) !important;
+}
+div[data-testid="stButton"] > button[kind="secondary"] {
+    background : var(--white) !important;
+    color      : var(--slate-700) !important;
+    border     : 1px solid var(--slate-200) !important;
+    box-shadow : var(--s0) !important;
+}
+
+/* ─── 16. EXPANDERS ─────────────────────────────────── */
+div[data-testid="stExpander"] {
+    background    : var(--white) !important;
+    border        : 1px solid var(--slate-200) !important;
+    border-radius : var(--r) !important;
+    box-shadow    : var(--s0) !important;
+    margin-bottom : .7rem !important;
+    overflow      : hidden !important;
+    transition    : box-shadow .18s, border-color .18s;
+}
+div[data-testid="stExpander"]:hover { box-shadow: var(--s1) !important; border-color: var(--blue-200) !important; }
+div[data-testid="stExpander"] details summary {
+    padding: 13px 18px !important;
+    background: var(--slate-50) !important;
+    border-bottom: 1px solid transparent !important;
+    transition: background .15s; cursor: pointer;
+}
+div[data-testid="stExpander"] details[open] summary {
+    background: var(--white) !important;
+    border-bottom-color: var(--slate-200) !important;
+}
+div[data-testid="stExpander"] details summary:hover { background: #edf0f4 !important; }
+div[data-testid="stExpander"] details summary p {
+    font-size: .92rem !important; font-weight: 600 !important;
+    color: var(--slate-800) !important; margin: 0 !important;
+}
+div[data-testid="stExpander"] details div[data-testid="stExpanderDetails"] { padding: 18px 20px !important; }
+div[data-testid="stExpanderDetails"] em,
+div[data-testid="stExpanderDetails"] p em { font-style: italic; color: var(--slate-600); font-size: .9rem; line-height: 1.8; }
+
+/* ─── 17. ALERT BANNERS ─────────────────────────────── */
+div[data-testid="stAlert"] {
+    border-radius : var(--r) !important;
+    border-width  : 1px !important;
+    border-style  : solid !important;
+    padding       : 12px 16px !important;
+    box-shadow    : none !important;
+    font-family   : 'Inter', sans-serif !important;
+    margin-bottom : .6rem !important;
+}
+[data-testid="stNotificationContentError"],
+div[data-testid="stAlert"][kind="error"] {
+    background   : var(--red-50) !important;
+    border-color : var(--red-100) !important;
+    border-left  : 3px solid var(--red-500) !important;
+    color        : var(--red-700) !important;
+}
+[data-testid="stNotificationContentWarning"],
+div[data-testid="stAlert"][kind="warning"] {
+    background   : var(--amber-50) !important;
+    border-color : var(--amber-100) !important;
+    border-left  : 3px solid var(--amber-700) !important;
+    color        : var(--amber-700) !important;
+}
+[data-testid="stNotificationContentSuccess"],
+div[data-testid="stAlert"][kind="success"] {
+    background   : var(--green-50) !important;
+    border-color : var(--green-100) !important;
+    border-left  : 3px solid var(--green-700) !important;
+    color        : var(--green-700) !important;
+}
+[data-testid="stNotificationContentInfo"],
+div[data-testid="stAlert"][kind="info"] {
+    background   : var(--blue-50) !important;
+    border-color : var(--blue-100) !important;
+    border-left  : 3px solid var(--blue-500) !important;
+    color        : var(--blue-800) !important;
+}
+
+/* ─── 18. MARKDOWN & CODE ───────────────────────────── */
+div[data-testid="stMarkdownContainer"] p      { font-size: .92rem; color: var(--slate-700); line-height: 1.8; }
+div[data-testid="stMarkdownContainer"] strong { color: var(--slate-900); font-weight: 600; }
+code {
+    font-family   : 'IBM Plex Mono', monospace !important;
+    background    : var(--slate-100) !important;
+    color         : var(--blue-700) !important;
+    border        : 1px solid var(--slate-200) !important;
+    padding       : 1px 6px !important;
+    border-radius : 4px !important;
+    font-size     : .82em !important;
+}
+h2, h3 { font-family: 'Inter', sans-serif !important; color: var(--slate-900) !important; font-weight: 600 !important; }
+h2     { font-size: 1.2rem !important; }
+h3     { font-size: 1rem !important; }
+
+/* ─── 19. MISC ──────────────────────────────────────── */
+hr[data-testid="stDivider"]         { border-color: var(--slate-200) !important; margin: 1.2rem 0 !important; }
+div[data-testid="stSpinner"] p      { font-family: 'IBM Plex Mono', monospace !important; font-size: .82rem !important; color: var(--slate-500) !important; }
+div[data-testid="stCaptionContainer"] p {
+    font-family: 'IBM Plex Mono', monospace !important; font-size: .76rem !important;
+    color: var(--slate-500) !important; padding: 5px 10px;
+    background: var(--slate-50); border: 1px solid var(--slate-200);
+    border-radius: 6px; display: inline-block;
+}
+
+/* ─── 20. RESULT BLOCK ──────────────────────────────── */
+.result-block {
+    background    : var(--white);
+    border        : 1px solid var(--slate-200);
+    border-radius : var(--r);
+    overflow      : hidden;
+    box-shadow    : var(--s1);
+    margin-top    : 1.4rem;
+}
+
+.trigger-bar {
+    display      : flex;
+    align-items  : center;
+    gap          : 9px;
+    padding      : 11px 18px;
+    border-bottom: 1px solid var(--slate-200);
+    background   : var(--slate-50);
+    font-family  : 'IBM Plex Mono', monospace;
+    font-size    : .75rem;
+    color        : var(--slate-500);
+    flex-wrap    : wrap;
+}
+.trigger-name   { color: var(--green-700); font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
+.trigger-detail { color: var(--slate-500); font-family: 'IBM Plex Mono', monospace; }
+.trigger-icon { display: inline-flex; color: var(--slate-500); flex-shrink: 0; }
+.trigger-icon svg { width: 15px; height: 15px; display: block; }
+
+.risk-banner {
+    display      : flex;
+    align-items  : center;
+    gap          : 12px;
+    padding      : 16px 20px;
+    border-bottom: 1px solid transparent;
+}
+.risk-banner--critical {
+    background   : var(--red-50);
+    border-color : var(--red-100) !important;
+    animation    : crit-pulse 3s ease-in-out infinite;
+}
+.risk-banner--high   { background: #fff7f7; border-color: #fde8e8 !important; }
+.risk-banner--medium { background: var(--amber-50); border-color: var(--amber-100) !important; }
+.risk-banner--low    { background: var(--green-50); border-color: var(--green-100) !important; }
+
+@keyframes crit-pulse {
+    0%,100% { box-shadow: none; }
+    50%     { box-shadow: 0 0 0 4px rgba(185,28,28,.08); }
+}
+
+.risk-banner-icon  { display: inline-flex; flex-shrink: 0; }
+.risk-banner-icon svg { width: 20px; height: 20px; display: block; }
+.risk-banner-label { font-size: .95rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.risk-banner-score { font-size: .9rem; font-weight: 500; }
+.risk-banner--critical .risk-banner-icon,
+.risk-banner--high .risk-banner-icon    { color: var(--red-700); }
+.risk-banner--medium .risk-banner-icon  { color: var(--amber-700); }
+.risk-banner--low .risk-banner-icon     { color: var(--green-700); }
+
+.risk-banner--critical .risk-banner-label,
+.risk-banner--critical .risk-banner-score,
+.risk-banner--high .risk-banner-label,
+.risk-banner--high .risk-banner-score { color: var(--red-700); }
+.risk-banner--medium .risk-banner-label,
+.risk-banner--medium .risk-banner-score { color: var(--amber-700); }
+.risk-banner--low .risk-banner-label,
+.risk-banner--low .risk-banner-score { color: var(--green-700); }
+
+.action-row {
+    padding      : 12px 20px;
+    border-bottom: 1px solid var(--slate-200);
+    background   : var(--white);
+    font-size    : .88rem;
+    color        : var(--slate-700);
+}
+.action-row strong { font-weight: 600; color: var(--slate-900); }
+
+.detail-grid {
+    display               : grid;
+    grid-template-columns : 1fr 1fr 1fr;
+    background            : var(--white);
+}
+.dg-col            { padding: 18px 20px; border-right: 1px solid var(--slate-200); }
+.dg-col:last-child { border-right: none; background: var(--blue-50); }
+.dg-label {
+    font-family    : 'IBM Plex Mono', monospace;
+    font-size      : .68rem;
+    font-weight    : 700;
+    text-transform : uppercase;
+    letter-spacing : 1px;
+    color          : var(--slate-500);
+    margin-bottom  : 8px;
+}
+.dg-label.defense { color: var(--blue-700); }
+.dg-val           { font-size: .88rem; color: var(--slate-700); line-height: 1.7; }
+.dg-val.mit-val   { color: var(--blue-800); font-weight: 500; }
+.dg-sep           { margin: 14px 0 12px; border: none; border-top: 1px solid var(--slate-200); }
+
+/* ─── XAI EXPANDER inside result-block (native <details>) ─ */
+.xai-expander {
+    border-top : 1px solid var(--slate-200);
+    background : var(--white);
+}
+.xai-expander summary {
+    list-style       : none;
+    cursor           : pointer;
+    padding          : 12px 18px;
+    display          : flex;
+    align-items      : center;
+    gap              : 10px;
+    user-select      : none;
+    background       : var(--white);
+    transition       : background .12s;
+}
+.xai-expander summary::-webkit-details-marker { display: none; }
+.xai-expander summary:hover { background: var(--slate-50); }
+.xai-icon    { display: inline-flex; color: var(--blue-600); flex-shrink: 0; }
+.xai-icon svg { width: 18px; height: 18px; display: block; }
+.xai-title   { flex: 1; font-size: .92rem; font-weight: 600; color: var(--slate-800); }
+.xai-chevron { display: inline-flex; color: var(--slate-400); flex-shrink: 0; transition: transform .2s; }
+.xai-chevron svg { width: 16px; height: 16px; display: block; }
+.xai-expander[open] .xai-chevron { transform: rotate(180deg); }
+.xai-body {
+    padding    : 0 18px 18px;
+    background : var(--white);
+}
+.xai-body p {
+    margin       : 0;
+    font-size    : .88rem;
+    font-style   : italic;
+    color        : var(--slate-600);
+    line-height  : 1.8;
+    padding-top  : 4px;
+    border-top   : 1px solid var(--slate-100);
+}
+
+/* ─── 21. TAXONOMY LINKS ────────────────────────────── */
+.tax-link,
+a[href*="tech_id"] {
+    font-family     : 'IBM Plex Mono', monospace !important;
+    font-size       : .8rem !important;
+    font-weight     : 600 !important;
+    color           : var(--blue-700) !important;
+    background      : var(--blue-50);
+    border          : 1px solid var(--blue-200);
+    border-radius   : 5px;
+    padding         : 3px 9px;
+    text-decoration : none !important;
+    transition      : all .15s;
+    display         : inline-block;
+    margin          : 2px 2px 2px 0;
+}
+.tax-link:hover,
+a[href*="tech_id"]:hover { background: var(--blue-100); color: var(--blue-900) !important; }
+
+/* ─── END ───────────────────────────────────────────── */
