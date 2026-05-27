@@ -1,6 +1,8 @@
 import json
 from openai import OpenAI, RateLimitError, AuthenticationError
 from schema.models import PayloadRequest, RiskAnalysisResponse
+import os
+from dotenv import load_dotenv
 
 
 def evaluate_with_llm(payload: PayloadRequest, combined_text: str, static_penalty: float,
@@ -55,10 +57,17 @@ def evaluate_with_llm(payload: PayloadRequest, combined_text: str, static_penalt
                       "mitigation_action": "<Action in detail or 'None'>"
                     }}"""
 
-    # NOTA DEVSECOPS: Queste chiavi andranno poi spostate nel file .env!
-    GROQ_API_KEYS = [
-        "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"
-    ]
+    # Carica le variabili d'ambiente dal file .env
+    load_dotenv()
+
+    # Estrae la stringa dal file .env e la trasforma in una lista pulita
+    groq_keys_string = os.getenv("GROQ_API_KEYS", "")
+    GROQ_API_KEYS = [key.strip() for key in groq_keys_string.split(",") if key.strip()]
+
+    # Controllo di sicurezza iniziale per evitare crash muti
+    if not GROQ_API_KEYS:
+        raise ValueError(
+            "Nessuna chiave GROQ trovata! Verifica che il file .env sia presente e configurato correttamente.")
 
     response = None
     for key in GROQ_API_KEYS:
@@ -71,7 +80,9 @@ def evaluate_with_llm(payload: PayloadRequest, combined_text: str, static_penalt
                 temperature=0.0
             )
             break
-        except (RateLimitError, AuthenticationError, Exception):
+        except (RateLimitError, AuthenticationError, Exception) as e:
+            # Il print è opzionale ma consigliato per fare debug in console se le chiavi saltano
+            print(f"⚠️ Chiave bypassata per errore: {e}")
             continue
 
     if not response:

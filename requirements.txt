@@ -25,3 +25,11 @@ pdfplumber==0.10.3
 # Richieste HTTP verso il backend e gestione upload file
 requests==2.31.0
 python-multipart==0.0.9
+openai~=2.34.0
+python-dotenv~=1.2.2
+pillow~=10.4.0
+pandas~=2.3.3
+seaborn~=0.13.2
+matplotlib~=3.10.9
+scikit-learn~=1.8.0
+tqdm~=4.67.3
