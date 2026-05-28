@@ -1,4 +1,4 @@
-#  Janus Gateway: Advanced LLM Security Engine
+# Janus Gateway: Advanced LLM Security Engine
 
 [![MITRE ATLAS Aligned](https://img.shields.io/badge/MITRE%20ATLAS-Aligned-blue)](https://atlas.mitre.org/)
 [![OWASP Top 10 LLM](https://img.shields.io/badge/OWASP-Top%2010%20LLM-red)](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
@@ -41,35 +41,35 @@ Janus operates as a **Dual-Layer Proxy**:
 
 ##  Performance & Validation
 
-Janus is rigorously tested against an adversarial dataset generated through AI Red Teaming. Our latest evaluation highlights:
+Janus is rigorously tested against an adversarial dataset of **10,000 samples** (2,000 per risk class) generated through AI Red Teaming. Our latest evaluation highlights exceptional results:
 
-* **93% Recall on CRITICAL threats**: Ensuring that host-level attacks (RCE, LFI, System Prompt leakage) are blocked with maximum reliability.
-* **Context-Aware Baseline**: Minimizes false positives through a "Theoretical Loophole" protocol that safely processes educational queries and academic theory without triggering alert fatigue.
+* **93% Global Accuracy**: Consistent performance across the entire threat spectrum.
+* **100% Recall on CRITICAL threats**: The system intercepted 100% (Recall 1.00, F1-Score 0.96) of host-level attacks (RCE, LFI, System Prompt leakage), ensuring maximum reliability.
+* **97% Recall on HIGH threats**: Extremely high sensitivity to Jailbreaks and data exfiltration attempts.
+* **Conservative Security Bias**: Analysis of the confusion matrix demonstrates that the engine favors classifying edge cases into the higher risk class ("safe" false positives), reducing the likelihood of a malicious attack being labeled as benign (false negative) to near zero.
 
 > [!TIP]
-> View our latest **Confusion Matrix** in the `/Validation/Benchmarking` folder to see the systematic alignment across all risk levels.
-
----
+> View our complete **Confusion Matrix** and **Classification Report** in the `/Validation/Benchmarking` folder to see the systematic alignment across all risk levels.
 
 ---
 
 ##  Getting Started
 
-Follow these instructions to set up the Janus Gateway on your local environment for testing or development.
+Follow these formal deployment procedures to configure the Janus Gateway on your local environment for testing or development purposes.
 
 ### Prerequisites
 
-* **Python 3.10+**: Ensure you have a modern Python environment.
+* **Python 3.10+**: Ensure you have a modern Python runtime environment.
 * **API Access**: 
     * A **Groq API Key** (Get one at [console.groq.com](https://console.groq.com/)).
     * OR a local instance of **Ollama** running (Download at [ollama.com](https://ollama.com/)).
-* **Environment Variables**: A `.env` file in the root directory (optional, but recommended).
+* **Environment Variables**: A `.env` file in the root directory (optional, but highly recommended).
 
 ### Installation
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/YourUsername/JanusGateway.git
+   git clone [https://github.com/YourUsername/JanusGateway.git](https://github.com/YourUsername/JanusGateway.git)
    cd JanusGateway
    ```
 
@@ -89,15 +89,26 @@ Follow these instructions to set up the Janus Gateway on your local environment 
    pip install -r requirements.txt
    ```
 
-### Run the Backend
+### System Initialization
 
-Launch the FastAPI server using Uvicorn:
+The Janus Gateway architecture requires both the backend API and the frontend interface to operate concurrently. Please utilize two separate terminal instances for the deployment.
+
+**Terminal 1: Backend Deployment**
+Ensure your virtual environment is active, then launch the FastAPI server:
 
 ```bash
 cd backend
 uvicorn main:app --reload
 ```
-The API will be available at `http://127.0.0.1:8000`. You can access the interactive documentation at `http://127.0.0.1:8000/docs`.
+*The API will be accessible at `http://127.0.0.1:8000`. Interactive documentation is available at `http://127.0.0.1:8000/docs`.*
+
+**Terminal 2: Frontend Deployment**
+Open a new terminal window, navigate to the project root, activate the virtual environment again, and launch the Streamlit interface:
+
+```bash
+streamlit run app.py
+```
+*The Security Dashboard will automatically launch in your default web browser (typically at `http://localhost:8501`).*
 
 ---
 
@@ -143,6 +154,4 @@ This project was developed by **Francesco Guarini** as part of a Master's Thesis
 
 * **Academic Institution**: Università degli Studi di Bari "Aldo Moro".
 * **Frameworks**: Special thanks to the **MITRE ATLAS™** and **OWASP** communities for their invaluable research in LLM security.
-* **Technology**: Built with **FastAPI**, **Groq LPU Architecture**, and **Llama 3.1**.
-
----
+* **Technology**: Built with **FastAPI**, **Streamlit**, **Groq LPU Architecture**, and **Llama 3.1**.
