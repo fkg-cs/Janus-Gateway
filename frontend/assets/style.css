@@ -44,7 +44,9 @@ footer,
 .block-container {
     padding-top    : 1.4rem !important;
     padding-bottom : 2.4rem !important;
-    max-width      : 98% !important;
+    padding-left   : 1.5rem !important;
+    padding-right  : 1.5rem !important;
+    max-width      : 100% !important;
 }
 
 /* Scrollbars — light & always visible */
@@ -76,7 +78,7 @@ div[data-testid="column"] {
     border        : 1px solid var(--slate-200);
     border-radius : var(--r);
     box-shadow    : var(--s1);
-    margin-bottom : 1.8rem;
+    margin-bottom : 1.4rem;
 }
 
 .header-logo          { width: 60px; height: 60px; object-fit: contain; flex-shrink: 0; }
@@ -142,22 +144,21 @@ div[data-testid="column"] {
 .github-link:hover { background: var(--blue-100); border-color: var(--blue-400); transform: translateY(-1px); }
 .github-wrapper    { display: none !important; }
 
-/* ─── 4. MAIN TABS — INLINE NAVBAR (transform lift) ───
-   Lift tablist into header zone (transform keeps it in flow);
-   collapse the original space with negative margin so the
-   tabpanels rise back. Tabs are horizontally centered in the
-   navbar via justify-content. */
+/* ─── 4. MAIN TABS — INLINE NAVBAR (transform lift) ─── */
 div[data-testid="stTab"] > div > div:first-child {
-    transform     : translateY(-103px) !important;
-    margin        : 0 0 -50px 0 !important;
+    transform     : translateY(-96px) !important;
+    margin        : 0 0 -90px 0 !important;
     background    : transparent !important;
     padding       : 0 !important;
     position      : relative;
-    z-index       : 50;
-    pointer-events: none;
+    z-index       : 10000 !important;
+    pointer-events: none !important; /* Il contenitore "fantasma" lascia passare i click */
 }
-div[data-testid="stTab"] > div > div:first-child > div,
-div[data-testid="stTab"] > div > div:first-child button[role="tab"] { pointer-events: auto; }
+
+/* Riattiva i click SOLO ED ESCLUSIVAMENTE sui bottoni centrali, liberando i lati */
+div[data-testid="stTab"] > div > div:first-child button[role="tab"] {
+    pointer-events: auto !important;
+}
 
 /* Hide BOTH Streamlit-injected indicators (outer divider + inner sliding bar) */
 div[data-testid="stTab"] > div > div[role="presentation"],
@@ -195,7 +196,19 @@ button[role="tab"][aria-selected="true"] {
     color       : var(--blue-700) !important;
     font-weight : 600 !important;
 }
+/* Tab attivo: colora l'icona e rafforza il font */
+button[role="tab"][aria-selected="true"] {
+    color       : var(--blue-700) !important;
+    font-weight : 600 !important;
+}
 
+/* Tab attivo: FORZA ANCHE IL TESTO a diventare blu */
+button[role="tab"][aria-selected="true"] p,
+button[role="tab"][aria-selected="true"] span,
+button[role="tab"][aria-selected="true"] div {
+    color       : var(--blue-700) !important;
+    font-weight : 600 !important;
+}
 /* Main tab SVG icons (FontAwesome-style monochrome, mask-image) */
 button[role="tab"]::before {
     content              : '';
@@ -217,10 +230,10 @@ button[role="tab"]:nth-of-type(1)::before {
     -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 3.5A1.5 1.5 0 0 1 5.5 2H19a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6.5a1.5 1.5 0 0 0 0 3H20v1H5.5A2.5 2.5 0 0 1 3 20.5v-17a.5.5 0 0 1 1 0zM6 17h12V4H6v13z'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 3.5A1.5 1.5 0 0 1 5.5 2H19a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6.5a1.5 1.5 0 0 0 0 3H20v1H5.5A2.5 2.5 0 0 1 3 20.5v-17a.5.5 0 0 1 1 0zM6 17h12V4H6v13z'/%3E%3C/svg%3E");
 }
-/* Tab 2: Risk Engine — radar/target icon */
+/* Tab 2: Risk Engine — Shield Lightning icon */
 button[role="tab"]:nth-of-type(2)::before {
-    -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-14a6 6 0 1 0 6 6 6 6 0 0 0-6-6zm0 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4zm0-6a2 2 0 1 0 2 2 2 2 0 0 0-2-2z'/%3E%3C/svg%3E");
-    mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-14a6 6 0 1 0 6 6 6 6 0 0 0-6-6zm0 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4zm0-6a2 2 0 1 0 2 2 2 2 0 0 0-2-2z'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3zm1 14.5V13h2.5L11 6.5V11H8.5L13 16.5z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3zm1 14.5V13h2.5L11 6.5V11H8.5L13 16.5z'/%3E%3C/svg%3E");
 }
 
 /* sub-tabs */
@@ -635,24 +648,29 @@ div[data-testid="stTextArea"] textarea:focus {
 }
 div[data-testid="stTextArea"] textarea::placeholder { color: var(--slate-400) !important; font-style: italic; }
 
-/* ─── 14. FILE UPLOADER (compact, single-line) ────── */
+/* ─── 14. FILE UPLOADER (ispessito e prominente) ────── */
 div[data-testid="stFileUploader"] {
     border        : 1px dashed var(--slate-300) !important;
     border-radius : var(--r) !important;
     background    : var(--white) !important;
     transition    : border-color .15s, background .15s;
     padding       : 0 !important;
+    height        : 68px !important; /* Altezza fissa imposta */
+    display       : flex !important;
+    align-items   : center !important;
+    margin        : 0 !important;
 }
 div[data-testid="stFileUploader"]:hover {
     border-color : var(--blue-400) !important;
     background   : var(--blue-50) !important;
 }
 div[data-testid="stFileUploader"] section {
-    padding     : 8px 14px !important;
-    min-height  : 0 !important;
+    padding     : 0 20px !important;
+    height      : 100% !important; /* Riempie l'altezza del contenitore */
+    width       : 100% !important;
     display     : flex !important;
     align-items : center !important;
-    gap         : 10px !important;
+    gap         : 14px !important;
 }
 div[data-testid="stFileUploader"] section > div:first-child {
     flex: 1 !important;
@@ -663,43 +681,76 @@ div[data-testid="stFileUploader"] section [data-testid="stFileUploaderDropzoneIn
     padding: 0 !important;
 }
 div[data-testid="stFileUploader"] section [data-testid="stFileUploaderDropzoneInstructions"] > div > span {
-    font-size: .85rem !important;
+    font-size: .95rem !important;
     color: var(--slate-600) !important;
 }
 div[data-testid="stFileUploader"] section button {
-    padding: 4px 12px !important;
-    font-size: .8rem !important;
-    height: 32px !important;
+    padding: 6px 16px !important;
+    font-size: .85rem !important;
+    height: 38px !important;
+    margin: 0 !important;
 }
 
-/* ─── 15. BUTTON ────────────────────────────────────── */
-div[data-testid="stButton"] > button {
-    font-family   : 'Inter', sans-serif !important;
-    font-weight   : 600 !important;
-    font-size     : .9rem !important;
+/* ─── 15. BUTTON (Run analysis allineato ed evidenziato) ───────────── */
+div[data-testid="stButton"] {
+    display     : flex !important;
+    align-items : stretch !important;
+    margin      : 0 !important;
+    padding     : 0 !important;
+}
+
+/* Forziamo i 68px SOLO se il contenitore ha dentro il bottone primary */
+div[data-testid="stButton"]:has(button[kind="primary"]) {
+    height      : 68px !important;
+}
+
+/* Sfondo più morbido (Soft Indigo) e struttura bottone */
+div[data-testid="stButton"] > button[kind="primary"] {
     border-radius : var(--r) !important;
     border        : none !important;
-    background    : var(--blue-700) !important;
-    color         : #fff !important;
-    letter-spacing: .2px !important;
-    padding       : 10px 20px !important;
-    box-shadow    : 0 2px 8px rgba(29,78,216,.28) !important;
+    background    : #6366f1 !important; /* Colore meno deciso, più elegante e moderno */
+    padding       : 0 24px !important;
+    height        : 100% !important;
+    width         : 100% !important;
+    margin        : 0 !important;
+    box-shadow    : 0 4px 10px rgba(99, 102, 241, 0.25) !important;
     transition    : all .15s ease !important;
 }
-div[data-testid="stButton"] > button:hover {
-    background : var(--blue-900) !important;
-    box-shadow : 0 4px 16px rgba(29,78,216,.38) !important;
+
+div[data-testid="stButton"] > button[kind="primary"]:hover {
+    background : #4f46e5 !important; /* Si scurisce leggermente al passaggio del mouse */
+    box-shadow : 0 6px 16px rgba(99, 102, 241, 0.35) !important;
     transform  : translateY(-1px) !important;
 }
-div[data-testid="stButton"] > button:active {
+
+div[data-testid="stButton"] > button[kind="primary"]:active {
     transform  : translateY(0) !important;
-    box-shadow : 0 1px 4px rgba(29,78,216,.2) !important;
+    box-shadow : 0 2px 5px rgba(99, 102, 241, 0.2) !important;
 }
+
+/* FORZATURA DEL TESTO BIANCO: Colpiamo i tag interni che Streamlit usa per il testo */
+div[data-testid="stButton"] > button[kind="primary"] p,
+div[data-testid="stButton"] > button[kind="primary"] div {
+    font-family   : 'Inter', sans-serif !important;
+    font-weight   : 600 !important;
+    font-size     : 1.05rem !important;
+    color         : #ffffff !important; /* Bianco puro per massima leggibilità garantita */
+    letter-spacing: .5px !important;
+    margin        : 0 !important;
+    display       : flex !important;
+    align-items   : center !important;
+    justify-content: center !important;
+}
+
+/* Stile per i bottoni SECONDARY (es. "Back" nel deep link) */
 div[data-testid="stButton"] > button[kind="secondary"] {
     background : var(--white) !important;
     color      : var(--slate-700) !important;
     border     : 1px solid var(--slate-200) !important;
     box-shadow : var(--s0) !important;
+    height     : auto !important;
+    padding    : 10px 20px !important;
+    font-size  : .9rem !important;
 }
 
 /* ─── 16. EXPANDERS ─────────────────────────────────── */
@@ -725,7 +776,7 @@ div[data-testid="stExpander"] details[open] summary {
 }
 div[data-testid="stExpander"] details summary:hover { background: #edf0f4 !important; }
 div[data-testid="stExpander"] details summary p {
-    font-size: .92rem !important; font-weight: 600 !important;
+    font-size: .92rem !important; font-weight: 550 !important;
     color: var(--slate-800) !important; margin: 0 !important;
 }
 div[data-testid="stExpander"] details div[data-testid="stExpanderDetails"] { padding: 18px 20px !important; }
@@ -950,4 +1001,42 @@ a[href*="tech_id"] {
 .tax-link:hover,
 a[href*="tech_id"]:hover { background: var(--blue-100); color: var(--blue-900) !important; }
 
+/* ─── 22. RESPONSIVE DESIGN (FIX PER ZOOM E SCHERMI PICCOLI) ─────────── */
+@media screen and (max-width: 1250px) {
+    /* 1. Sblocca l'altezza fissa dell'header e gli permette di andare a capo */
+    .header-wrapper {
+        flex-wrap: wrap;
+        height: auto !important;
+        padding: 20px 28px !important;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    /* 2. Il titolo e il logo si centrano meglio su schermi stretti */
+    .header-title-container {
+        min-width: 250px;
+    }
+
+    /* 3. DISATTIVA IL SOLLEVAMENTO: i tab tornano sotto l'header,
+          evitando qualsiasi sovrapposizione con le scritte! */
+    div[data-testid="stTab"] > div > div:first-child {
+        transform: translateY(0) !important;
+        margin: 0 0 1.5rem 0 !important;
+    }
+
+    /* 4. Restituisce un'altezza normale ai tab quando non sono nel banner */
+    div[role="tablist"] {
+        height: 55px !important;
+        border-bottom: 1px solid var(--slate-200) !important;
+    }
+    button[role="tab"] {
+        height: 55px !important;
+    }
+}
+/* ─── 23. BILANCIAMENTO VERTICALE RIGA METADATI ─── */
+div[data-testid="stMarkdownContainer"] p:has(svg) {
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: translateY(10px) !important;
+}
 /* ─── END ───────────────────────────────────────────── */

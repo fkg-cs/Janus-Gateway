@@ -10,10 +10,12 @@ import PyPDF2
 st.set_page_config(page_title="Janus Gateway", page_icon="🛡️", layout="wide")
 API_URL = "http://127.0.0.1:8000"
 
+
 # --- CSS ---
 def load_css(file_path):
     with open(file_path, "r") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 
 css_path = Path(__file__).parent / "assets" / "style.css"
 if css_path.exists():
@@ -29,15 +31,16 @@ if logo_path.exists():
 else:
     logo_html = '<span class="header-logo-fallback">🛡️</span>'
 
+# Aggiunto z-index: 9999 per evitare che layer invisibili di Streamlit blocchino il click sul pulsante GitHub
 st.markdown(f"""
-<div class="header-wrapper">
+<div class="header-wrapper" style="position: relative; z-index: 9999;">
   {logo_html}
   <div class="header-title-container">
     <h1>Janus Gateway</h1>
-    <p>Advanced Semantic Risk Engine &amp; Threat Intelligence for LLM</p>
+    <p>Threat Intelligence &amp; Prompt Risk Engine for LLM</p>
   </div>
   <div class="status-pill"><span class="status-dot"></span>system online</div>
-  <a href="{github_url}" target="_blank" class="github-link">
+  <a href="{github_url}" target="_blank" class="github-link" style="position: relative; z-index: 9999;">
     <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
       <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/>
     </svg>
@@ -60,12 +63,18 @@ def _md_inline(text):
 
 
 _SVG_BASE = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"'
-_SHIELD_SVG  = f'<svg {_SVG_BASE}><path d="M12 3l8 3v6c0 4.5-3.4 8.4-8 9-4.6-.6-8-4.5-8-9V6l8-3z"/></svg>'
-_ALERT_SVG   = f'<svg {_SVG_BASE}><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
-_WARN_SVG    = f'<svg {_SVG_BASE}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
-_CHECK_SVG   = f'<svg {_SVG_BASE}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
-_BRAIN_SVG   = f'<svg {_SVG_BASE}><path d="M12 2a3 3 0 0 0-3 3v.5a2.5 2.5 0 0 0-2 4.5 3 3 0 0 0 0 4 2.5 2.5 0 0 0 2 4.5V19a3 3 0 0 0 6 0v-.5a2.5 2.5 0 0 0 2-4.5 3 3 0 0 0 0-4 2.5 2.5 0 0 0-2-4.5V5a3 3 0 0 0-3-3z"/></svg>'
+_SHIELD_SVG = f'<svg {_SVG_BASE}><path d="M12 3l8 3v6c0 4.5-3.4 8.4-8 9-4.6-.6-8-4.5-8-9V6l8-3z"/></svg>'
+_ALERT_SVG = f'<svg {_SVG_BASE}><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+_WARN_SVG = f'<svg {_SVG_BASE}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+_CHECK_SVG = f'<svg {_SVG_BASE}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+_BRAIN_SVG   = f'<svg {_SVG_BASE}><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.002 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>'
 _CHEVRON_SVG = f'<svg {_SVG_BASE}><polyline points="6 9 12 15 18 9"/></svg>'
+_CALENDAR_SVG = f'<svg {_SVG_BASE} style="width:14px;height:14px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'
+_CLOCK_SVG = f'<svg {_SVG_BASE} style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+_TARGET_SVG = f'<svg {_SVG_BASE} style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'
+_USER_SVG = f'<svg {_SVG_BASE} style="width:14px;height:14px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
+_GATEWAY_SVG = f'<svg {_SVG_BASE}><path d="M4 22v-4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M14 6L10 6"/><path d="M14 10L10 10"/><path d="M12 2v10"/><path d="M8 14H4v-4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4h-4"/></svg>'
+
 
 def render_mitigations(items):
     """Renders a list of mitigations as clean white cards with minimal shield icon."""
@@ -87,8 +96,7 @@ def render_callout(title, body, variant="blue"):
 
 
 def render_meta_strip(maturity, cases, mitigations, platforms=None, created=None, modified=None, tactics=None):
-    """Renders the meta-strip + optional info-strip as compact HTML.
-    NOTE: Must be single-line — Streamlit's markdown parser treats 4+ leading spaces as code blocks."""
+    """Renders the meta-strip + optional info-strip as compact HTML."""
     cols_class = "meta-strip" if platforms is not None else "meta-strip cols-3"
     p_cell = (
         f'<div class="meta-cell"><div class="meta-label">Platforms</div><div class="meta-value">{_e(platforms)}</div></div>'
@@ -99,9 +107,9 @@ def render_meta_strip(maturity, cases, mitigations, platforms=None, created=None
         tactics_str = ", ".join(tactics) if tactics else "N/A"
         info_strip = (
             '<div class="info-strip">'
-            f'<div class="info-cell"><span class="info-cell-icon">📅</span><div><div class="info-cell-lbl">Created</div><div class="info-cell-val">{_e(created or "N/A")}</div></div></div>'
-            f'<div class="info-cell"><span class="info-cell-icon">🕒</span><div><div class="info-cell-lbl">Last modified</div><div class="info-cell-val">{_e(modified or "N/A")}</div></div></div>'
-            f'<div class="info-cell"><span class="info-cell-icon">🎯</span><div><div class="info-cell-lbl">Tactics</div><div class="info-cell-val">{_e(tactics_str)}</div></div></div>'
+            f'<div class="info-cell"><span class="info-cell-icon">{_CALENDAR_SVG}</span><div><div class="info-cell-lbl">Created</div><div class="info-cell-val">{_e(created or "N/A")}</div></div></div>'
+            f'<div class="info-cell"><span class="info-cell-icon">{_CLOCK_SVG}</span><div><div class="info-cell-lbl">Last modified</div><div class="info-cell-val">{_e(modified or "N/A")}</div></div></div>'
+            f'<div class="info-cell"><span class="info-cell-icon">{_TARGET_SVG}</span><div><div class="info-cell-lbl">Tactics</div><div class="info-cell-val">{_e(tactics_str)}</div></div></div>'
             '</div>'
         )
     return (
@@ -153,10 +161,10 @@ def render_result_block(result):
     else:
         taxonomy_html = '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.82rem;color:var(--slate-400)">N/A</span>'
 
-    intent     = _e(result.get("detected_intent", "N/A"))
-    impact     = _e(result.get("impact", "N/A"))
+    intent = _e(result.get("detected_intent", "N/A"))
+    impact = _e(result.get("impact", "N/A"))
     mitigation = _e(result.get("mitigation_action", "N/A"))
-    reasoning  = _e(result.get("reasoning", "No reasoning provided by the engine."))
+    reasoning = _e(result.get("reasoning", "No reasoning provided by the engine."))
 
     return (
         '<div class="result-block">'
@@ -183,8 +191,7 @@ if "tech_id" in query_params:
         st.query_params.clear()
         st.rerun()
 
-    st.markdown(f'<h2 class="page-title">Threat Intelligence — {_e(tech_id)}</h2>', unsafe_allow_html=True)
-    st.divider()
+    st.markdown("<div style='margin-top: 1.8rem;'></div>", unsafe_allow_html=True)
 
     try:
         if tech_id.startswith("AML."):
@@ -193,19 +200,28 @@ if "tech_id" in query_params:
 
             if stix_id:
                 tech = requests.get(f"{API_URL}/techniques/{stix_id}").json()
-                st.markdown(f'<h3 class="tech-detail-title">{_e(tech["id"])}: {_e(tech["name"])}</h3>', unsafe_allow_html=True)
+                st.markdown(f'<h3 class="tech-detail-title">{_e(tech["id"])}: {_e(tech["name"])}</h3>',
+                            unsafe_allow_html=True)
 
+                # Aggiunti tutti i parametri per mantenere la UI uguale al main panel
                 st.markdown(render_meta_strip(
                     maturity=tech.get("maturity_level", "N/A"),
                     cases=tech.get("case_studies_count", 0),
                     mitigations=tech.get("mitigations_count", 0),
+                    platforms=len(tech.get("platforms", [])),
+                    created=tech.get("created", "N/A"),
+                    modified=tech.get("modified", "N/A"),
+                    tactics=tech.get("tactics", []),
                 ), unsafe_allow_html=True)
 
                 st.markdown('<div class="section-label">Description</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="description-text">{_md_inline(tech.get("description", "No description available."))}</div>', unsafe_allow_html=True)
+                st.markdown(
+                    f'<div class="description-text">{_md_inline(tech.get("description", "No description available."))}</div>',
+                    unsafe_allow_html=True)
 
                 if tech.get("mitigations"):
-                    st.markdown('<div class="section-label defense">Suggested Mitigations</div>', unsafe_allow_html=True)
+                    st.markdown('<div class="section-label defense">Suggested Mitigations</div>',
+                                unsafe_allow_html=True)
                     st.markdown(render_mitigations(tech["mitigations"]), unsafe_allow_html=True)
 
                 if tech.get("case_studies"):
@@ -214,7 +230,18 @@ if "tech_id" in query_params:
                         with st.expander(cs["name"], expanded=False):
                             st.markdown(f"**Summary:** {cs.get('summary', 'No summary.')}")
                             st.divider()
-                            st.write(cs.get("description", "No description available."))
+
+                            # Filtro per sostituire dinamicamente le emoji con gli SVG in stile inline
+                            desc = cs.get("description", "No description available.")
+                            desc = desc.replace("📅",
+                                                f'<span style="display:inline-flex;align-items:center;color:var(--slate-400);margin-right:4px;vertical-align:-2px;">{_CALENDAR_SVG}</span>')
+                            desc = desc.replace("🎯",
+                                                f'<span style="display:inline-flex;align-items:center;color:var(--slate-400);margin-right:4px;vertical-align:-2px;">{_TARGET_SVG}</span>')
+                            desc = desc.replace("🕵️",
+                                                f'<span style="display:inline-flex;align-items:center;color:var(--slate-400);margin-right:4px;vertical-align:-2px;">{_USER_SVG}</span>')
+                            desc = desc.replace("👤",
+                                                f'<span style="display:inline-flex;align-items:center;color:var(--slate-400);margin-right:4px;vertical-align:-2px;">{_USER_SVG}</span>')
+                            st.markdown(desc, unsafe_allow_html=True)
                 else:
                     st.info("No historical case studies found for this technique.")
             else:
@@ -225,7 +252,8 @@ if "tech_id" in query_params:
             item = next((i for i in owasp_data if i["id"].startswith(tech_id)), None)
 
             if item:
-                st.markdown(f'<h3 class="tech-detail-title">{_e(item["id"])}: {_e(item["name"])}</h3>', unsafe_allow_html=True)
+                st.markdown(f'<h3 class="tech-detail-title">{_e(item["id"])}: {_e(item["name"])}</h3>',
+                            unsafe_allow_html=True)
                 st.markdown(render_callout("Description", item["description"], "blue"), unsafe_allow_html=True)
                 st.markdown(render_callout("Impact", item["impact"], "red"), unsafe_allow_html=True)
                 if "example" in item:
@@ -241,11 +269,9 @@ if "tech_id" in query_params:
 
     st.stop()
 
-
 # ─── MAIN NAVIGATION ────────────────────────────────────
 
 tab_kb, tab_engine = st.tabs(["Knowledge Bases", "Risk Engine"])
-
 
 # ── TAB 1: KNOWLEDGE BASE ───────────────────────────────
 with tab_kb:
@@ -279,7 +305,8 @@ with tab_kb:
                 tech_display = [f"{t['id']} — {t['name']}" for t in techniques]
                 filtered_techs = [t for t in tech_display if search_term.lower() in t.lower()]
                 if filtered_techs:
-                    selected_tech_name = st.radio("Techniques", filtered_techs, label_visibility="collapsed", key="tech_radio")
+                    selected_tech_name = st.radio("Techniques", filtered_techs, label_visibility="collapsed",
+                                                  key="tech_radio")
                     selected_index = tech_display.index(selected_tech_name)
                     selected_stix_id = techniques[selected_index]["stix_id"]
                 else:
@@ -295,7 +322,8 @@ with tab_kb:
                         owasp_display = [f"{item['id']} — {item['name']}" for item in owasp_data]
                         filtered_owasp = [o for o in owasp_display if search_term.lower() in o.lower()]
                         if filtered_owasp:
-                            selected_owasp_name = st.radio("Vulnerabilities", filtered_owasp, label_visibility="collapsed", key="owasp_radio")
+                            selected_owasp_name = st.radio("Vulnerabilities", filtered_owasp,
+                                                           label_visibility="collapsed", key="owasp_radio")
                             selected_owasp_index = owasp_display.index(selected_owasp_name)
                             selected_owasp_item = owasp_data[selected_owasp_index]
                         else:
@@ -312,7 +340,8 @@ with tab_kb:
         if kb_type == "MITRE ATLAS™" and selected_stix_id:
             try:
                 tech = requests.get(f"{API_URL}/techniques/{selected_stix_id}").json()
-                st.markdown(f'<h3 class="tech-detail-title">{_e(tech["id"])}: {_e(tech["name"])}</h3>', unsafe_allow_html=True)
+                st.markdown(f'<h3 class="tech-detail-title">{_e(tech["id"])}: {_e(tech["name"])}</h3>',
+                            unsafe_allow_html=True)
 
                 st.markdown(render_meta_strip(
                     maturity=tech.get("maturity_level", "N/A"),
@@ -325,10 +354,13 @@ with tab_kb:
                 ), unsafe_allow_html=True)
 
                 st.markdown('<div class="section-label">Description</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="description-text">{_md_inline(tech.get("description", "No description available."))}</div>', unsafe_allow_html=True)
+                st.markdown(
+                    f'<div class="description-text">{_md_inline(tech.get("description", "No description available."))}</div>',
+                    unsafe_allow_html=True)
 
                 if tech.get("mitigations"):
-                    st.markdown('<div class="section-label defense">Suggested Mitigations</div>', unsafe_allow_html=True)
+                    st.markdown('<div class="section-label defense">Suggested Mitigations</div>',
+                                unsafe_allow_html=True)
                     st.markdown(render_mitigations(tech["mitigations"]), unsafe_allow_html=True)
 
                 if tech.get("case_studies"):
@@ -337,7 +369,18 @@ with tab_kb:
                         with st.expander(cs["name"], expanded=False):
                             st.markdown(f"**Summary:** {cs.get('summary', 'No summary.')}")
                             st.divider()
-                            st.write(cs.get("description", "No description available."))
+
+                            # Filtro per sostituire dinamicamente le emoji con gli SVG in stile inline
+                            desc = cs.get("description", "No description available.")
+                            desc = desc.replace("📅",
+                                                f'<span style="display:inline-flex;align-items:center;color:var(--slate-400);margin-right:4px;vertical-align:-2px;">{_CALENDAR_SVG}</span>')
+                            desc = desc.replace("🎯",
+                                                f'<span style="display:inline-flex;align-items:center;color:var(--slate-400);margin-right:4px;vertical-align:-2px;">{_TARGET_SVG}</span>')
+                            desc = desc.replace("🕵️",
+                                                f'<span style="display:inline-flex;align-items:center;color:var(--slate-400);margin-right:4px;vertical-align:-2px;">{_USER_SVG}</span>')
+                            desc = desc.replace("👤",
+                                                f'<span style="display:inline-flex;align-items:center;color:var(--slate-400);margin-right:4px;vertical-align:-2px;">{_USER_SVG}</span>')
+                            st.markdown(desc, unsafe_allow_html=True)
                 elif tech.get("case_studies_count", 0) > 0:
                     st.info("Case studies exist but detailed data was not loaded from YAML.")
             except Exception as e:
@@ -345,30 +388,31 @@ with tab_kb:
 
         elif kb_type == "OWASP LLM" and selected_owasp_item:
             item = selected_owasp_item
-            st.markdown(f'<h3 class="tech-detail-title">{_e(item["id"])}: {_e(item["name"])}</h3>', unsafe_allow_html=True)
+            st.markdown(f'<h3 class="tech-detail-title">{_e(item["id"])}: {_e(item["name"])}</h3>',
+                        unsafe_allow_html=True)
 
             st.markdown('<div class="section-label">Description</div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="description-text">{_md_inline(item["description"])}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="description-text">{_md_inline(item["description"])}</div>',
+                        unsafe_allow_html=True)
 
             st.markdown('<div class="section-label">Impact</div>', unsafe_allow_html=True)
             st.markdown(f'<div class="description-text">{_md_inline(item["impact"])}</div>', unsafe_allow_html=True)
 
             if "example" in item:
                 st.markdown('<div class="section-label">Attack Scenario</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="description-text">{_md_inline(item["example"])}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="description-text">{_md_inline(item["example"])}</div>',
+                            unsafe_allow_html=True)
 
             if "mitigations" in item and item["mitigations"]:
                 st.markdown('<div class="section-label defense">Recommended Mitigations</div>', unsafe_allow_html=True)
                 st.markdown(render_mitigations(item["mitigations"]), unsafe_allow_html=True)
 
-
 # ── TAB 2: RISK ENGINE ──────────────────────────────────
 with tab_engine:
     user_prompt = st.text_area(
-        "User Prompt",
-        placeholder="Insert the prompt to analyze, or upload a document below…",
+        "User Prompt and attachments Analysis",
+        placeholder="Insert the prompt to analyze,upload a document below and click run analysis...",
         height=160,
-        label_visibility="collapsed"
     )
 
     col_upload, col_run = st.columns([3.2, 1])
@@ -379,7 +423,7 @@ with tab_engine:
             label_visibility="collapsed",
         )
     with col_run:
-        run_clicked = st.button("▶  Run analysis", use_container_width=True, key="run_btn")
+        run_clicked = st.button("▶  Run analysis", type="primary", use_container_width=True, key="run_btn")
 
     if run_clicked:
         if not user_prompt and not uploaded_file:
