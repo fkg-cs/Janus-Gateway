@@ -37,7 +37,7 @@ st.markdown(f"""
   {logo_html}
   <div class="header-title-container">
     <h1>Janus Gateway</h1>
-    <p>Threat Intelligence &amp; Prompt Risk Engine for LLM</p>
+    <p>Threat Intelligence &amp; Prompt Risk Engine</p>
   </div>
   <div class="status-pill"><span class="status-dot"></span>system online</div>
   <a href="{github_url}" target="_blank" class="github-link" style="position: relative; z-index: 9999;">
