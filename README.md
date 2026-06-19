@@ -22,7 +22,8 @@ Developed as part of a Master's Thesis at the **University of Bari "Aldo Moro"**
 ---
 
 ## Architecture
-<img width="824" height="358" alt="image" src="https://github.com/user-attachments/assets/602133ea-111d-432a-b307-5f3db2f3048e" />
+<img width="1234" height="535" alt="image" src="https://github.com/user-attachments/assets/4a45e21b-7d07-4683-bfce-9b0256aab3c7" />
+
 
 
 Janus operates as a **Dual-Layer Proxy**:
